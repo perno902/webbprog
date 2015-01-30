@@ -185,7 +185,7 @@ p {
     float:left;
     margin-left: 20px;
     width: 400px;
-    height: 320px;
+    height: 500px;
     overflow: scroll;
 }
 

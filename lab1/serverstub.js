@@ -88,6 +88,7 @@ serverstub.getUserMessagesByToken = function(token){
     var email = tokenToEmail(token);
     return serverstub.getUserMessagesByEmail(token,email);
 };
+
 serverstub.getUserMessagesByEmail = function(token, email){
     if (loggedInUsers[token] != null){
         if (users[email] != null) {
@@ -100,6 +101,7 @@ serverstub.getUserMessagesByEmail = function(token, email){
         return {"success": false, "message": "You are not signed in."};
     }
 };
+
 serverstub.signOut = function(token){
     if (loggedInUsers[token] != undefined){
         delete loggedInUsers[token];
@@ -109,6 +111,7 @@ serverstub.signOut = function(token){
         return {"success": false, "message": "You are not signed in."};
     }
 };
+
 serverstub.signUp = function(formData){ // {email, password, firstname, familyname, gender, city, country}
     if (users[formData.email] === undefined){
         if(formData.email != undefined && formData.password != undefined && formData.firstname != undefined && formData.familyname != undefined && formData.gender != undefined && formData.city != undefined && formData.country != undefined){
@@ -131,11 +134,13 @@ serverstub.signUp = function(formData){ // {email, password, firstname, familyna
         return {"success": false, "message": "User already exists."};
     }
 };
+
 serverstub.changePassword = function(token, oldPassword, newPassword){
     if (loggedInUsers[token] != null){
         var email = tokenToEmail(token);
         if (users[email].password == oldPassword){
             users[email].password = newPassword;
+	    persistUsers();
             return {"success": true, "message": "Password changed."};
         } else {
             return {"success": false, "message": "Wrong password."};
