@@ -158,12 +158,10 @@
     </script>
   </head>
   <body>
-<<<<<<< HEAD
 
-=======
+
     <!-- test -->
     <!-- hejsan kommentar -->
->>>>>>> 9252c4a4db1f59f9936a27512abce597bb6fdf54
     <div id="divTest" class="totalSpace">
     </div>
   <div>
