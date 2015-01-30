@@ -97,8 +97,43 @@
             <div id="home" onclick="selectTab(this)" class="panelTab" >Home</div>
             <div id="browse" onclick="selectTab(this)" class="panelTab" >Browse</div>
             <div id="account" onclick="selectTab(this)" class="panelTab" >Account</div>
-            <div id="displayHome"> </div>
-            <div id="displayBrowse"> </div>
+            <div id="displayHome"> 
+	      
+	      <div id="personalInfo">
+		<p>Personal info:</p>
+		<div id="userEmail" class="personalInfoField"> </div>
+		<div id="userFirstName" class="personalInfoField"> </div>
+		<div id="userFamilyName" class="personalInfoField"> </div>
+		<div id="userGender" class="personalInfoField"> </div>
+		<div id="userCity" class="personalInfoField"> </div>
+		<div id="userCountry" class="personalInfoField"> </div>
+	      </div>
+	      
+	      <div id="postMessage">	
+		<form id="postMessageForm"> 
+		  <input type="text" name="message" required>
+		  <input type="button" name="postMessage" value="Send" onclick="sendMessage();"> 
+		</form>
+	      </div>
+	      
+	      
+	      <div id="wall"> </div>
+	      
+	      <div> 
+		<button id="reloadWallButton" onclick="getMessages(document.getElementById('userEmail').innerHTML);">Reload wall</button>
+	      </div>
+	      
+	      
+
+
+	    </div>
+            <div id="displayBrowse"> 
+	      <form id="searchForm" onsubmit="getProfile(document.getElementById('searchForm').elements.namedItem('searchMail').value);">
+		<label for="searchEmail">Enter a user email: </label>
+		<input type="text" name="searchEmail" required>
+		<input type="button" name="search" value="View profile" onclick="searchUser();"> 
+	      </form>
+	    </div>
             <div id="displayAccount">
                 <div id="changePasswordDiv">
                     <form id="changePasswordForm">
@@ -123,7 +158,7 @@
     </script>
   </head>
   <body>
-    <!-- test -->
+
     <div id="divTest" class="totalSpace">
     </div>
   <div>
