@@ -14,9 +14,9 @@
       <img src="wimage.png">
     </div>
 
-	<!-- Login form top right -->
+    <!-- Login form top right -->
 	<div id="loginDiv">
-      <form id="loginForm" onsubmit="loginForm();" >
+      <form id="loginForm" >
 
 		<div class="inputFields">
 			<label for="username">Email: </label>
@@ -30,7 +30,7 @@
 		</div>
 
 		<div class="submitButtons">
-			<input type="submit" name="login" value="Login">
+			<input type="button" name="login" value="Login" onclick="loginForm();">
 		</div>
       </form>
 	</div>
@@ -38,7 +38,7 @@
     <!-- Sign up form lower right -->
 
 	<div id="signUpDiv">
-		<form id="signUpForm" onsubmit="sendForm();">
+		<form id="signUpForm">
 
 			<p> Sign up here </p>
 
@@ -88,7 +88,7 @@
 			</div>
 
 			<div class="submitButtons">
-				<input type="submit" name="submit" value="Submit">
+				<input type="button" name="submit" value="Submit" onclick="sendForm();">
 			</div>
 
 		</form>
