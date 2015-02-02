@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
+
+<!-- kommenatar -->
+<!-- En till -->
 <html>
 <head>
     <link href="client.css" type="text/css" rel="stylesheet">
@@ -11,9 +14,9 @@
       <img src="wimage.png">
     </div>
 
-	<!-- Login form top right -->
+    <!-- Login form top right -->
 	<div id="loginDiv">
-      <form id="loginForm" onsubmit="loginForm();" >
+      <form id="loginForm" >
 
 		<div class="inputFields">
 			<label for="username">Email: </label>
@@ -27,7 +30,7 @@
 		</div>
 
 		<div class="submitButtons">
-			<input type="submit" name="login" value="Login">
+			<input type="button" name="login" value="Login" onclick="loginForm();">
 		</div>
       </form>
 	</div>
@@ -35,7 +38,7 @@
     <!-- Sign up form lower right -->
 
 	<div id="signUpDiv">
-		<form id="signUpForm" onsubmit="sendForm();">
+		<form id="signUpForm">
 
 			<p> Sign up here </p>
 
@@ -85,7 +88,7 @@
 			</div>
 
 			<div class="submitButtons">
-				<input type="submit" name="submit" value="Submit">
+				<input type="button" name="submit" value="Submit" onclick="sendForm();">
 			</div>
 
 		</form>
@@ -97,8 +100,43 @@
             <div id="home" onclick="selectTab(this)" class="panelTab" >Home</div>
             <div id="browse" onclick="selectTab(this)" class="panelTab" >Browse</div>
             <div id="account" onclick="selectTab(this)" class="panelTab" >Account</div>
-            <div id="displayHome"> </div>
-            <div id="displayBrowse"> </div>
+            <div id="displayHome"> 
+	      
+	      <div id="personalInfo">
+		<p>Personal info:</p>
+		<div id="userEmail" class="personalInfoField"> </div>
+		<div id="userFirstName" class="personalInfoField"> </div>
+		<div id="userFamilyName" class="personalInfoField"> </div>
+		<div id="userGender" class="personalInfoField"> </div>
+		<div id="userCity" class="personalInfoField"> </div>
+		<div id="userCountry" class="personalInfoField"> </div>
+	      </div>
+	      
+	      <div id="postMessage">	
+		<form id="postMessageForm"> 
+		  <input type="text" name="message" required>
+		  <input type="button" name="postMessage" value="Send" onclick="sendMessage();"> 
+		</form>
+	      </div>
+	      
+	      
+	      <div id="wall"> </div>
+	      
+	      <div> 
+		<button id="reloadWallButton" onclick="getMessages(document.getElementById('userEmail').innerHTML);">Reload wall</button>
+	      </div>
+	      
+	      
+
+
+	    </div>
+            <div id="displayBrowse"> 
+	      <form id="searchForm" onsubmit="getProfile(document.getElementById('searchForm').elements.namedItem('searchMail').value);">
+		<label for="searchEmail">Enter a user email: </label>
+		<input type="text" name="searchEmail" required>
+		<input type="button" name="search" value="View profile" onclick="searchUser();"> 
+	      </form>
+	    </div>
             <div id="displayAccount">
                 <div id="changePasswordDiv">
                     <form id="changePasswordForm">

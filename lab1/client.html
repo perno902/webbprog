@@ -1,7 +1,5 @@
 ﻿<!DOCTYPE html>
 
-<!-- kommenatar -->
-<!-- En till -->
 <html>
 <head>
     <link href="client.css" type="text/css" rel="stylesheet">
@@ -30,7 +28,8 @@
 		</div>
 
 		<div class="submitButtons">
-			<input type="button" name="login" value="Login" onclick="loginForm();">
+		  <p id="loginMessage" class="alertMessage"></p>
+		  <input type="button" name="login" value="Login" onclick="loginForm();">
 		</div>
       </form>
 	</div>
@@ -88,10 +87,10 @@
 			</div>
 
 			<div class="submitButtons">
-				<input type="button" name="submit" value="Submit" onclick="sendForm();">
+			  <input type="button" name="submit" value="Submit" onclick="sendForm();">
 			</div>
-
 		</form>
+		<p id="signupMessage" class="alertMessage"></p>
 	</div>
     </div>
 </script>

@@ -5,7 +5,8 @@ displayView = function(){
 
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
-        showDefault();
+       	selectTab(document.getElementById("home"));
+
 
     }else{
         document.getElementById("divTest").innerHTML = document.getElementById("welcomeView").innerHTML;
@@ -105,34 +106,7 @@ logout = function(){
     displayView();
 };
 
-selectTab = function(item){
 
-    document.getElementById("displayHome").style.display = "block";
-    document.getElementById("displayBrowse").style.display = "none";
-    document.getElementById("displayAccount").style.display = "none";
-
-    if(item.innerHTML == "Browse"){
-        document.getElementById("displayHome").style.display = "none";
-        document.getElementById("displayBrowse").style.display = "block";
-        document.getElementById("displayAccount").style.display = "none";
-
-
-    }else if (item.innerHTML == "Account") {
-        document.getElementById("displayAccount").style.display = "block";
-        document.getElementById("displayHome").style.display = "none";
-        document.getElementById("displayBrowse").style.display = "none";
-
-    }
-
-};
-
-showDefault = function(){
-
-    document.getElementById("displayHome").style.display = "block";
-    document.getElementById("displayBrowse").style.display = "none";
-    document.getElementById("displayAccount").style.display = "none";
-
-};
 
 changePassword = function(){
     var oldPassword = document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value;
@@ -155,5 +129,115 @@ changePassword = function(){
             window.alert(result.message);
             return false;
         }
+    }
+};
+
+
+
+  
+selectTab = function(item){
+
+    console.log(item.id);
+    
+    if(item.innerHTML =="Home") {
+	document.getElementById("displayHome").style.display = "block";
+	document.getElementById("displayBrowse").style.display = "none";
+	document.getElementById("displayAccount").style.display = "none";
+	getProfile(getCurrentEmail());
+
+    }else if(item.innerHTML == "Browse"){
+
+        document.getElementById("displayHome").style.display = "none";
+        document.getElementById("displayBrowse").style.display = "block";
+        document.getElementById("displayAccount").style.display = "none";
+
+
+    }else if (item.innerHTML =="Account") {
+
+        document.getElementById("displayHome").style.display = "none";
+        document.getElementById("displayBrowse").style.display = "none";
+        document.getElementById("displayAccount").style.display = "block";
+
+    }
+};
+
+selectHomeTab = function() {
+    document.getElementById("displayHome").style.display = "block";
+    document.getElementById("displayBrowse").style.display = "none";
+    document.getElementById("displayAccount").style.display = "none";
+};
+
+
+
+//-----------------------------------------------------
+
+
+getCurrentEmail = function() {
+    var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));
+    return userData.data.email;
+};
+
+searchUser = function() {
+    userEmail = document.getElementById("searchForm").elements.namedItem("searchEmail").value;
+    getProfile(userEmail);
+    selectHomeTab();
+   
+};
+
+
+getProfile = function(userEmail) {
+    getUserData(userEmail);
+    getMessages(userEmail);
+};
+
+getUserData = function(userEmail) {
+    var userData = serverstub.getUserDataByEmail(localStorage.getItem('userToken'), userEmail);
+
+
+    document.getElementById("userEmail").innerHTML = userData.data.email;
+    document.getElementById("userFirstName").innerHTML = userData.data.firstname;
+    document.getElementById("userFamilyName").innerHTML = userData.data.familyname;
+    document.getElementById("userGender").innerHTML = userData.data.gender;
+    document.getElementById("userCity").innerHTML = userData.data.city;
+    document.getElementById("userCountry").innerHTML = userData.data.country;  
+
+};
+
+
+
+sendMessage = function() {
+    
+    var message = document.getElementById("postMessageForm").elements.namedItem("message").value;
+    var token = localStorage.getItem("userToken");
+    var email = document.getElementById("userEmail").innerHTML;
+    
+    
+    var sentMessage = serverstub.postMessage(token, message, email);
+    
+    if(!sentMessage.success){
+	window.alert(sentMessage.message);
+    }
+};
+
+
+getMessages = function(userEmail) {
+    var messages = serverstub.getUserMessagesByEmail(localStorage.getItem("userToken"), userEmail);
+    var wall = document.getElementById("wall");
+
+    while (wall.hasChildNodes()) {   
+	wall.removeChild(wall.firstChild);
+    }
+    
+    wall.appendChild(document.createElement("hr"));
+
+    for (i = 0; i < messages.data.length; i++) {
+	var message = document.createTextNode(messages.data[i].content);
+	var writer = document.createTextNode(messages.data[i].writer);
+	
+	wall.appendChild(message);
+	wall.appendChild(document.createElement("br"));
+	wall.appendChild(document.createTextNode(" posted by "));
+	wall.appendChild(writer);
+	wall.appendChild(document.createElement("hr"));
     }
 };

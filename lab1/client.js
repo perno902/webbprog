@@ -1,8 +1,5 @@
 displayView = function(){
     //the code required to display view
-    //document.getElementById("divTest").innerHTML = document.getElementById("welcomeView").innerHTML;
-
-
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
        	selectTab(document.getElementById("home"));
@@ -22,8 +19,6 @@ window.onload = function(){
     //code that executes as the page is loaded.
     //You shall put your own custom code here.
     displayView();
-    console.log("AJAJAJAJA");
-
 };
 
 
@@ -34,19 +29,15 @@ validateForm = function(){
     var passwordRepeat = document.getElementById("signUpForm").elements.namedItem("repeatPSW").value;
 
     if(checkPasswordLength(password) || checkPasswordLength(passwordRepeat)){
-        window.alert("Passwords must be at least 4 characters long.");
+	document.getElementById("signupMessage").innerHTML = "Passwords must be at least 4 characters long.";
+	return false;
     }
-    //checkPasswordLength(password);
-    //checkPasswordLength(passwordRepeat);
-    /*if(password.length < 4 || passwordRepeat.length < 4){
-        window.alert("Passwords must be at least 4 characters long.");
-        return false;
-    }*/
 
     if(password == passwordRepeat ){
-        return true;
+	return true;
     }
-    window.alert("Passwords do not match.");
+    //window.alert("Passwords do not match.");
+    document.getElementById("signupMessage").innerHTML = "Passwords do not match.";
     return false;
 
 };
@@ -57,8 +48,6 @@ checkPasswordLength = function(password){
 
 
 sendForm = function(){
-
-
 
     var e = document.getElementById("signUpForm");
     var d = document.getElementById("genderSelect");
@@ -76,11 +65,8 @@ sendForm = function(){
 
     if(validateForm()){
         var result = serverstub.signUp(formData);
-        if(!result.success){
-            window.alert(result.message);
-        }
+	document.getElementById("signupMessage").innerHTML = result.message;
     }
-
     return false;
 };
 
@@ -92,9 +78,9 @@ loginForm = function(){
     var result = serverstub.signIn(username, password);
 
     if(!result.success){
-        window.alert(result.message);
-
+	document.getElementById("loginMessage").innerHTML = result.message;
     }else{
+	document.getElementById("loginMessage").innerHTML = "";
         localStorage.setItem("userToken", result.data);
         displayView();
     }
