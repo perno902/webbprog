@@ -202,6 +202,7 @@ p {
     margin-top: 30px;
 }
 
+
 .alertMessage {
     font-size: 7pt;
     float: left;
@@ -210,5 +211,15 @@ p {
     margin-top: 2px;
     margin-bottom: 2px;
 }
+
+#changePasswordText {
+    margin-left: 200px;
+    position:absolute;
+    visibility: visible;
+
+}
+
+
+
 
 

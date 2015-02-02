@@ -2,7 +2,10 @@ displayView = function(){
     //the code required to display view
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
-       	selectTab(document.getElementById("home"));
+
+
+        selectTab(document.getElementById("home"));
+
 
 
     }else{
@@ -93,37 +96,43 @@ logout = function(){
 };
 
 
-
 changePassword = function(){
     var oldPassword = document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value;
     var newPassword = document.getElementById("changePasswordForm").elements.namedItem("newPassword").value;
     var token = localStorage.getItem('userToken');
+    var changePasswordText = document.getElementById("changePasswordText");
 
     if(checkPasswordLength(newPassword)) {
-        window.alert("New password has to be 4 characters or more");
+        changePasswordText.innerHTML="Password has to be 4 characters or more";
     }else if(oldPassword == newPassword) {
-        window.alert("You picked the same password. Please pick another.");
+        changePasswordText.innerHTML="You picked the same password. Please pick another.";
     }
     else{
         var result = serverstub.changePassword(token, oldPassword, newPassword);
 
 
         if(result.success){
-            window.alert(result.message);
+
+            changePasswordText.innerHTML=result.message;
             return true;
         }else if(!result.success){
-            window.alert(result.message);
+            changePasswordText.innerHTML=result.message;
             return false;
         }
     }
+
+
 };
 
 
 
-  
+
 selectTab = function(item){
 
     console.log(item.id);
+
+    var changePasswordText = document.getElementById("changePasswordText");
+    changePasswordText.innerHTML ="";
     
     if(item.innerHTML =="Home") {
 	document.getElementById("displayHome").style.display = "block";
