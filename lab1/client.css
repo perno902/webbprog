@@ -202,5 +202,13 @@ p {
     margin-top: 30px;
 }
 
+#changePasswordText {
+    margin-left: 200px;
+    position:absolute;
+    visibility: visible;
+
+}
+
+
 
 
