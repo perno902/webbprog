@@ -4,7 +4,7 @@ __author__ = 'wyz'
 
 import sqlite3
 from flask import g
-from server import app
+
 
 DATABASE = 'C:/Users/cake/Dropbox/TDDD97/lab2/database.db'
 
@@ -26,7 +26,11 @@ def get_db():
 
 def testdb():
     c = get_db()
-    c.execute("select * from users")
+    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
+    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden')")
+    c.commit()
+    c.close()
+   # c.execute("select * from users")
 
 
 def init_db():
