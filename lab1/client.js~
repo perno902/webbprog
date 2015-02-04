@@ -2,20 +2,10 @@ displayView = function(){
     //the code required to display view
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
-
-
         selectTab(document.getElementById("home"));
-
-
-
     }else{
         document.getElementById("divTest").innerHTML = document.getElementById("welcomeView").innerHTML;
-
     }
-
-
-
-
 };
 
 window.onload = function(){
@@ -37,13 +27,13 @@ validateForm = function(){
     }
 
     if(password == passwordRepeat ){
-	return true;
+    	return true;
     }
-    //window.alert("Passwords do not match.");
     document.getElementById("signupMessage").innerHTML = "Passwords do not match.";
     return false;
 
 };
+
 //Return true for passwords which lenght is <= 3
 checkPasswordLength = function(password){
     return password.length <= 3;
@@ -68,7 +58,7 @@ sendForm = function(){
 
     if(validateForm()){
         var result = serverstub.signUp(formData);
-	document.getElementById("signupMessage").innerHTML = result.message;
+    	document.getElementById("signupMessage").innerHTML = result.message;
     }
     return false;
 };
@@ -81,9 +71,9 @@ loginForm = function(){
     var result = serverstub.signIn(username, password);
 
     if(!result.success){
-	document.getElementById("loginMessage").innerHTML = result.message;
+	    document.getElementById("loginMessage").innerHTML = result.message;
     }else{
-	document.getElementById("loginMessage").innerHTML = "";
+	    document.getElementById("loginMessage").innerHTML = "";
         localStorage.setItem("userToken", result.data);
         displayView();
     }
@@ -96,7 +86,6 @@ logout = function(){
 };
 
 
-// Denna ändrade jag på.
 changePassword = function(){
     var oldPassword = document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value;
     var newPassword = document.getElementById("changePasswordForm").elements.namedItem("newPassword").value;
@@ -110,10 +99,7 @@ changePassword = function(){
     }
     else{
         var result = serverstub.changePassword(token, oldPassword, newPassword);
-
-
         if(result.success){
-
             changePasswordText.innerHTML=result.message;
             return true;
         }else if(!result.success){
@@ -121,17 +107,8 @@ changePassword = function(){
             return false;
         }
     }
-    changePasswordText.style.display="hidden";
-
-
-
 };
 
-
-
-
-
-// Här med.
 selectTab = function(item){
 
     console.log(item.id);
@@ -168,10 +145,6 @@ selectHomeTab = function() {
 };
 
 
-
-//-----------------------------------------------------
-
-
 getCurrentEmail = function() {
     var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));
     return userData.data.email;
@@ -181,9 +154,7 @@ searchUser = function() {
     userEmail = document.getElementById("searchForm").elements.namedItem("searchEmail").value;
     getProfile(userEmail);
     selectHomeTab();
-   
 };
-
 
 getProfile = function(userEmail) {
     getUserData(userEmail);
@@ -204,14 +175,11 @@ getUserData = function(userEmail) {
 };
 
 
-
 sendMessage = function() {
     
     var message = document.getElementById("postMessageForm").elements.namedItem("message").value;
     var token = localStorage.getItem("userToken");
     var email = document.getElementById("userEmail").innerHTML;
-    
-    
     var sentMessage = serverstub.postMessage(token, message, email);
     
     if(!sentMessage.success){

@@ -202,7 +202,7 @@ p {
     margin-top: 30px;
 }
 
-<<<<<<< HEAD
+
 .alertMessage {
     font-size: 7pt;
     float: left;
@@ -211,7 +211,7 @@ p {
     margin-top: 2px;
     margin-bottom: 2px;
 }
-=======
+
 #changePasswordText {
     margin-left: 200px;
     position:absolute;
@@ -220,6 +220,6 @@ p {
 }
 
 
->>>>>>> b42a3f3163cfde9e32f68f6b6d90cb0f823422e7
+
 
 

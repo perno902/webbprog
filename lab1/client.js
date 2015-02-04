@@ -196,16 +196,21 @@ getMessages = function(userEmail) {
 	wall.removeChild(wall.firstChild);
     }
     
-    wall.appendChild(document.createElement("hr"));
+
 
     for (i = 0; i < messages.data.length; i++) {
+	var tempDiv = document.createElement("div");
 	var message = document.createTextNode(messages.data[i].content);
 	var writer = document.createTextNode(messages.data[i].writer);
 	
-	wall.appendChild(message);
-	wall.appendChild(document.createElement("br"));
-	wall.appendChild(document.createTextNode(" posted by "));
-	wall.appendChild(writer);
-	wall.appendChild(document.createElement("hr"));
+	tempDiv.className = "messageDiv";
+
+	wall.appendChild(tempDiv);
+	tempDiv.appendChild(message);
+	tempDiv.appendChild(document.createElement("br"));
+	tempDiv.appendChild(document.createTextNode(" posted by "));
+	tempDiv.appendChild(writer);
+	tempDiv.appendChild(document.createElement("br"))
+
     }
 };

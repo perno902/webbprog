@@ -6,11 +6,11 @@ import sqlite3
 from flask import g
 
 
-DATABASE = 'database.db'
+DATABASE = 'C:/Users/Pelle/Documents/Skola/TDDD97/webbprog/lab2/DATABASE.db'
 
 
 def connect_db():
-    return sqlite3.connect("database.db")
+    return sqlite3.connect("DATABASE.db")
 
 
 def get_db():
