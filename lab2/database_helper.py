@@ -1,4 +1,4 @@
-
+#-*- coding: utf-8 -*-
 
 __author__ = 'wyz'
 
@@ -6,11 +6,11 @@ import sqlite3
 from flask import g
 
 
-DATABASE = 'C:/Users/Pelle/Documents/Skola/TDDD97/webbprog/lab2/DATABASE.db'
+DATABASE = "C:\Users\Pelle\Dropbox\Webprog TDDD97\lab2\DATABASE.db"
 
 
 def connect_db():
-    return sqlite3.connect("DATABASE.db")
+    return sqlite3.connect("database.db")
 
 
 def get_db():
@@ -19,9 +19,29 @@ def get_db():
         db = g.db = connect_db()
     return db
 
+"""
+def checkUser(inputEmail):
+    firstPart = inputEmail.split('@')[0]
+    print firstPart
+    c = get_db()
+    result = c.execute("select email from users where email like 'firstPart%'")
 
-#def signUpUser(email, password, firstname, familyname, gender, city, country):
-#    return
+    if result == inputEmail:
+        return True
+    return False
+"""
+
+
+def signUpUser(email, password, firstname, familyname, gender, city, country):
+    c = get_db()
+    row = (email, password, firstname, familyname, gender, city, country)
+    try:
+        c.execute("insert into users values(?,?,?,?,?,?,?)", row)
+        c.commit()
+        return True
+    except:
+        c.rollback()
+        return False
 
 
 def testdb():
@@ -33,11 +53,11 @@ def testdb():
    # c.execute("select * from users")
 
 
+
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
     c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
-
     c.commit()
     print "database initalized"
 
