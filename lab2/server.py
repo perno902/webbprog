@@ -15,6 +15,7 @@ def hello():
     return "hello world!"
 
 
+
 @app.route('/signUp/<email>/<password>/<firstname>/<familyname>/<gender>/<city>/<country>', methods=["POST"])
 def signUp(email, password, firstname, familyname, gender, city, country):
     if request.method == 'POST':
