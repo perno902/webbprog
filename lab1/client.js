@@ -22,8 +22,13 @@ validateForm = function(){
     var passwordRepeat = document.getElementById("signUpForm").elements.namedItem("repeatPSW").value;
 
     if(checkPasswordLength(password) || checkPasswordLength(passwordRepeat)){
-	document.getElementById("signupMessage").innerHTML = "Passwords must be at least 4 characters long.";
-	return false;
+	    document.getElementById("signupMessage").innerHTML = "Passwords must be at least 4 characters long.";
+	    return false;
+    }
+
+    if(!checkEmail(document.getElementById("signUpForm").elements.namedItem("email").value)){
+        document.getElementById("signupMessage").innerHTML = "Not a legit email.";
+        return false;
     }
 
     if(password == passwordRepeat ){
@@ -40,23 +45,40 @@ checkPasswordLength = function(password){
 };
 
 
+checkEmail = function(email){
+    var re = /\S+@\S+\.\S+/;
+
+    if(re.test(email)){
+        console.log("returned true")
+        return true;
+    }
+    console.log("returned false")
+    return false;
+
+};
+
+
 sendForm = function(){
 
     var e = document.getElementById("signUpForm");
     var d = document.getElementById("genderSelect");
 
-    var formData = {
-        email: e.elements.namedItem("email").value,
-        password: e.elements.namedItem("password").value,
-        firstname: e.elements.namedItem("firstname").value,
-        familyname: e.elements.namedItem("familyname").value,
-        gender: d.options[d.selectedIndex].text,
-        city: e.elements.namedItem("city").value,
-        country: e.elements.namedItem("country").value
-    };
+    checkEmail(e.elements.namedItem("email").value);
+    console.log("send form ");
+    //console.log(checkEmail(e.elements.namedItem("email").value));
 
+        var formData = {
+            email: e.elements.namedItem("email").value,
+            password: e.elements.namedItem("password").value,
+            firstname: e.elements.namedItem("firstname").value,
+            familyname: e.elements.namedItem("familyname").value,
+            gender: d.options[d.selectedIndex].text,
+            city: e.elements.namedItem("city").value,
+            country: e.elements.namedItem("country").value
+        };
 
     if(validateForm()){
+        console.log("inside validatidate");
         var result = serverstub.signUp(formData);
     	document.getElementById("signupMessage").innerHTML = result.message;
     }
