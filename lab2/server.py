@@ -33,11 +33,11 @@ def signUp(email, password, firstname, familyname, gender, city, country):
             "Could not add contact"
 
 
-"""
+
 @app.teardown_appcontext
 def teardown_app(exception):
-    database_helper.close_db()
-"""
+    database_helper.close()
+
 
 if __name__ == '__main__':
     app.run()
