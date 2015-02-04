@@ -6,7 +6,7 @@ import sqlite3
 from flask import g
 
 
-DATABASE = 'C:/Users/cake/Dropbox/TDDD97/lab2/database.db'
+DATABASE = 'database.db'
 
 
 def connect_db():
@@ -37,6 +37,7 @@ def init_db():
     c = get_db()
     c.execute("drop table if exists users")
     c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
+
     c.commit()
     print "database initalized"
 
