@@ -1,4 +1,4 @@
-
+#-*- coding: utf-8 -*-
 
 __author__ = 'wyz'
 
@@ -20,6 +20,18 @@ def get_db():
         db.text_factory = str
     return db
 
+"""
+def checkUser(inputEmail):
+    firstPart = inputEmail.split('@')[0]
+    print firstPart
+    c = get_db()
+    result = c.execute("select email from users where email like 'firstPart%'")
+
+    if result == inputEmail:
+        return True
+    return False
+"""
+
 
 def checkUser(inputEmail):
     firstPart = inputEmail.split('@')[0]
@@ -30,17 +42,6 @@ def checkUser(inputEmail):
     if result == inputEmail:
         return True
     return False
-
-
-def signUpUser(email, password, firstname, familyname, gender, city, country):
-    c = get_db()
-    c.execute("insert into users (email, password, firstname, familyname, gender, city, country) values"
-        " ('email', 'password', 'firstname', 'familyname', 'gender', 'city', 'country')" )
-    c.commit()
-    c.close()
-
-
-#(email, password, firstname, familyname, gender, city, country)}
 
 
 def checkPassword(inputEmail, password):
@@ -67,6 +68,17 @@ def signInUser(token, email):
     c.commit()
     c.close()
 
+
+def signUpUser(email, password, firstname, familyname, gender, city, country):
+    c = get_db()
+    row = (email, password, firstname, familyname, gender, city, country)
+    try:
+        c.execute("insert into users values(?,?,?,?,?,?,?)", row)
+        c.commit()
+        return True
+    except:
+        c.rollback()
+        return False
 
 
 def testdb():
