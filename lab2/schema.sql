@@ -8,8 +8,9 @@ create table users(
   familyname text,
   gender text,
   city text,
-  country text
-  );
+  country text,
+  messages text
+);
 
 create table loggedInUsers (
   token text primary key,

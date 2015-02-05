@@ -6,11 +6,11 @@ import sqlite3
 from flask import g
 
 
-DATABASE = "C:\Users\Pelle\Dropbox\Webprog TDDD97\lab2\DATABASE.db"
+DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab2\DATABASE.db"
 
 
 def connect_db():
-    return sqlite3.connect("database.db")
+    return sqlite3.connect("DATABASE.db")
 
 
 def get_db():
@@ -81,10 +81,13 @@ def signUpUser(email, password, firstname, familyname, gender, city, country):
         return False
 
 
+def getMessages(userEmail):
+    c = get_db()
+
 def testdb():
     c = get_db()
-    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
-    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden')")
+    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden', '[]')")
+    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden', '[]')")
     c.commit()
     c.close()
    # c.execute("select * from users")
@@ -94,7 +97,9 @@ def testdb():
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
-    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
+    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT, messages TEXT)")
+    c.execute("drop table if exists loggedInUsers")
+    c.execute("CREATE TABLE loggedInUsers(token text primary key, email text, foreign key(email) references users(email))")
     c.commit()
     print "database initalized"
 
