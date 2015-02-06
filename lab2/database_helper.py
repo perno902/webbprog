@@ -6,42 +6,30 @@ import sqlite3
 from flask import g
 
 
-DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab2\DATABASE.db"
+DATABASE = "C:\Users\wyz\Dropbox\TDDD97\lab2\database.db"
 
 
 def connect_db():
-    return sqlite3.connect("DATABASE.db")
+    return sqlite3.connect("database.db")
 
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g.db = connect_db()
-        db.text_factory = str
     return db
 
-"""
-def checkUser(inputEmail):
-    firstPart = inputEmail.split('@')[0]
-    print firstPart
+
+def signUpUser(email, password, firstname, familyname, gender, city, country):
     c = get_db()
-    result = c.execute("select email from users where email like 'firstPart%'")
-
-    if result == inputEmail:
+    row = (email, password, firstname, familyname, gender, city, country)
+    try:
+        c.execute("insert into users values(?,?,?,?,?,?,?)", row)
+        c.commit()
         return True
-    return False
-"""
-
-
-def checkUser(inputEmail):
-    firstPart = inputEmail.split('@')[0]
-    print firstPart
-    c = get_db()
-    result = c.execute("select email from users where email like 'firstPart%'")
-
-    if result == inputEmail:
-        return True
-    return False
+    except:
+        c.rollback()
+        return False
 
 
 def checkPassword(inputEmail, password):
@@ -64,16 +52,35 @@ def checkPassword(inputEmail, password):
 def signInUser(token, email):
     c = get_db()
     print "insert into loggedInUsers values ('" + token + "', '" + email + "')"
-    c.execute("insert into loggedInUsers values ('" + token + "', '" + email + "')")
+    try:
+        c.execute("insert into loggedInUsers values ('" + token + "', '" + email + "')")
+    except:
+        return False
     c.commit()
     c.close()
 
 
-def signUpUser(email, password, firstname, familyname, gender, city, country):
+def getUser(inputEmail):
     c = get_db()
-    row = (email, password, firstname, familyname, gender, city, country)
+    cursor = c.cursor()
+    user = cursor.execute("select email from loggedInUsers where email like '" + inputEmail + "'")
+    userInfo = [row[0] for row in cursor.fetchall()]
+    return userInfo
+
+
+def getToken(inputEmail):
+    c = get_db()
+    cursor = c.cursor()
+    token = cursor.execute("select token from loggedInUsers where email like '" + inputEmail + "'")
+    return token
+
+
+def signOut(inputEmail):
+    c = get_db()
+    cursor = c.cursor()
+
     try:
-        c.execute("insert into users values(?,?,?,?,?,?,?)", row)
+        cursor.execute("delete from loggedInUsers where email like '" + inputEmail + "%'")
         c.commit()
         return True
     except:
@@ -81,27 +88,25 @@ def signUpUser(email, password, firstname, familyname, gender, city, country):
         return False
 
 
-def getMessages(userEmail):
-    c = get_db()
-
+"""
 def testdb():
     c = get_db()
-    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden', '[]')")
-    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden', '[]')")
+    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
+    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden')")
     c.commit()
     c.close()
    # c.execute("select * from users")
 
-
+"""
 
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
-    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT, messages TEXT)")
+    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
     c.execute("drop table if exists loggedInUsers")
-    c.execute("CREATE TABLE loggedInUsers(token text primary key, email text, foreign key(email) references users(email))")
+    c.execute("CREATE TABLE loggedInUsers(token TEXT, email text PRIMARY KEY , FOREIGN KEY(email) REFERENCES users(email))")
     c.commit()
-    print "database initalized"
+    print "database initialized"
 
 
 def close():
