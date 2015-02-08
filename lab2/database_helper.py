@@ -6,42 +6,30 @@ import sqlite3
 from flask import g
 
 
-DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab2\DATABASE.db"
+DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab2database.db"
 
 
 def connect_db():
-    return sqlite3.connect("DATABASE.db")
+    return sqlite3.connect("database.db")
 
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g.db = connect_db()
-        db.text_factory = str
     return db
 
-"""
-def checkUser(inputEmail):
-    firstPart = inputEmail.split('@')[0]
-    print firstPart
+
+def signUpUser(email, password, firstname, familyname, gender, city, country):
     c = get_db()
-    result = c.execute("select email from users where email like 'firstPart%'")
-
-    if result == inputEmail:
+    row = (email, password, firstname, familyname, gender, city, country)
+    try:
+        c.execute("insert into users values(?,?,?,?,?,?,?)", row)
+        c.commit()
         return True
-    return False
-"""
-
-
-def checkUser(inputEmail):
-    firstPart = inputEmail.split('@')[0]
-    print firstPart
-    c = get_db()
-    result = c.execute("select email from users where email like 'firstPart%'")
-
-    if result == inputEmail:
-        return True
-    return False
+    except:
+        c.rollback()
+        return False
 
 
 def checkPassword(inputEmail, password):
@@ -68,16 +56,33 @@ def signInUser(token, email):
 
 
 
-def signUpUser(email, password, firstname, familyname, gender, city, country):
+def getUser(inputEmail):
     c = get_db()
-    row = (email, password, firstname, familyname, gender, city, country)
+    cursor = c.cursor()
+    user = cursor.execute("select email from loggedInUsers where email like '" + inputEmail + "'")
+    userInfo = [row[0] for row in cursor.fetchall()]
+    return userInfo
+
+
+def getToken(inputEmail):
+    c = get_db()
+    cursor = c.cursor()
+    token = cursor.execute("select token from loggedInUsers where email like '" + inputEmail + "'")
+    return token
+
+
+def signOut(inputEmail):
+    c = get_db()
+    cursor = c.cursor()
+
     try:
-        c.execute("insert into users values(?,?,?,?,?,?,?)", row)
+        cursor.execute("delete from loggedInUsers where email like '" + inputEmail + "%'")
         c.commit()
         return True
     except:
         c.rollback()
         return False
+
 
 def postMessage(token, content, toEmail):
     c = get_db()
@@ -96,6 +101,9 @@ def postMessage(token, content, toEmail):
         return False
 
 
+
+
+"""
 def testdb():
     c = get_db()
     c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
@@ -104,18 +112,25 @@ def testdb():
     c.close()
    # c.execute("select * from users")
 
-
+"""
 
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
     c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
     c.execute("drop table if exists loggedInUsers")
+
     c.execute("CREATE TABLE loggedInUsers(token text primary key, email text, foreign key(email) references users(email))")
     c.execute("drop table if exists messages")
     c.execute("CREATE TABLE messages(recipient TEXT, writer TEXT, message TEXT, foreign key(recipient) references users(email), foreign key(writer) references users(email))")
+
+
+    # Row for testing purposes only:
+    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
+
     c.commit()
-    print "database initalized"
+    print "database initialized"
+
 
 
 def close():
