@@ -101,14 +101,20 @@
             <div id="account" onclick="selectTab(this)" class="panelTab" >Account</div>
             <div id="displayHome"> 
 	      
-	      <div id="personalInfo">
-		<p>Personal info:</p>
-		<div id="userEmail" class="personalInfoField"> </div>
-		<div id="userFirstName" class="personalInfoField"> </div>
-		<div id="userFamilyName" class="personalInfoField"> </div>
-		<div id="userGender" class="personalInfoField"> </div>
-		<div id="userCity" class="personalInfoField"> </div>
-		<div id="userCountry" class="personalInfoField"> </div>
+	      <div id = "homePanel">
+		<div id="personalInfo">
+		  <p>Personal info:</p>
+		  <div id="userEmail" class="personalInfoField"> </div>
+		  <div id="userFirstName" class="personalInfoField"> </div>
+		  <div id="userFamilyName" class="personalInfoField"> </div>
+		  <div id="userGender" class="personalInfoField"> </div>
+		  <div id="userCity" class="personalInfoField"> </div>
+		  <div id="userCountry" class="personalInfoField"> </div>
+		</div>
+		<div> 
+		  <button id="reloadWallButton" onclick="getMessages(document.getElementById('userEmail').innerHTML);">Reload wall</button>
+		</div>
+		
 	      </div>
 	      
 	      <div id="postMessage">	
@@ -121,10 +127,7 @@
 	      
 	      <div id="wall"> </div>
 	      
-	      <div> 
-		<button id="reloadWallButton" onclick="getMessages(document.getElementById('userEmail').innerHTML);">Reload wall</button>
-	      </div>
-	      
+
 	      
 
 

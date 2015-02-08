@@ -1,5 +1,5 @@
 displayView = function(){
-    //the code required to display view
+   //the code required to display view
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
         selectTab(document.getElementById("home"));
@@ -142,7 +142,8 @@ selectTab = function(item){
 	document.getElementById("displayHome").style.display = "block";
 	document.getElementById("displayBrowse").style.display = "none";
 	document.getElementById("displayAccount").style.display = "none";
-	getProfile(getCurrentEmail());
+	//getProfile(getCurrentEmail());
+	getCurrentProfile();
 
     }else if(item.innerHTML == "Browse"){
 
@@ -167,10 +168,12 @@ selectHomeTab = function() {
 };
 
 
+/*
 getCurrentEmail = function() {
     var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));
     return userData.data.email;
-};
+    };*/
+
 
 searchUser = function() {
     userEmail = document.getElementById("searchForm").elements.namedItem("searchEmail").value;
@@ -183,6 +186,8 @@ getProfile = function(userEmail) {
     getMessages(userEmail);
 };
 
+
+
 getUserData = function(userEmail) {
     var userData = serverstub.getUserDataByEmail(localStorage.getItem('userToken'), userEmail);
 
@@ -194,6 +199,51 @@ getUserData = function(userEmail) {
     document.getElementById("userCity").innerHTML = userData.data.city;
     document.getElementById("userCountry").innerHTML = userData.data.country;  
 
+};
+
+getCurrentProfile = function() {
+    getCurrentUserData();
+    getCurrentMessages();
+};
+
+getCurrentUserData = function() {
+    var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));
+
+    document.getElementById("userEmail").innerHTML = userData.data.email;
+    document.getElementById("userFirstName").innerHTML = userData.data.firstname;
+    document.getElementById("userFamilyName").innerHTML = userData.data.familyname;
+    document.getElementById("userGender").innerHTML = userData.data.gender;
+    document.getElementById("userCity").innerHTML = userData.data.city;
+    document.getElementById("userCountry").innerHTML = userData.data.country;     
+};
+
+getCurrentMessages = function() {
+    var messages = serverstub.getUserMessagesByToken(localStorage.getItem("userToken"));
+    var wall = document.getElementById("wall");
+
+    while (wall.hasChildNodes()) {   
+	wall.removeChild(wall.firstChild);
+    }
+    
+
+
+    for (i = 0; i < messages.data.length; i++) {
+	var tempDiv = document.createElement("div");
+	var message = document.createTextNode(messages.data[i].content);
+	var writer = document.createTextNode(messages.data[i].writer);
+	
+	tempDiv.className = "messageDiv";
+
+	wall.appendChild(tempDiv);
+	tempDiv.appendChild(message);
+	tempDiv.appendChild(document.createElement("br"));
+	tempDiv.appendChild(document.createTextNode(" posted by "));
+	tempDiv.appendChild(writer);
+	tempDiv.appendChild(document.createElement("br"))
+
+    }
+
+    console.log("hej det lyckades igen lol");
 };
 
 

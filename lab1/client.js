@@ -9,8 +9,6 @@ displayView = function(){
 };
 
 window.onload = function(){
-    //code that executes as the page is loaded.
-    //You shall put your own custom code here.
     displayView();
 };
 
@@ -49,10 +47,8 @@ checkEmail = function(email){
     var re = /\S+@\S+\.\S+/;
 
     if(re.test(email)){
-        console.log("returned true")
         return true;
     }
-    console.log("returned false")
     return false;
 
 };
@@ -64,7 +60,6 @@ sendForm = function(){
     var d = document.getElementById("genderSelect");
 
     checkEmail(e.elements.namedItem("email").value);
-    console.log("send form ");
     //console.log(checkEmail(e.elements.namedItem("email").value));
 
         var formData = {
@@ -78,7 +73,6 @@ sendForm = function(){
         };
 
     if(validateForm()){
-        console.log("inside validatidate");
         var result = serverstub.signUp(formData);
     	document.getElementById("signupMessage").innerHTML = result.message;
     }
@@ -142,8 +136,7 @@ selectTab = function(item){
 	document.getElementById("displayHome").style.display = "block";
 	document.getElementById("displayBrowse").style.display = "none";
 	document.getElementById("displayAccount").style.display = "none";
-	//getProfile(getCurrentEmail());
-	getCurrentProfile();
+	getProfile(null, true);
 
     }else if(item.innerHTML == "Browse"){
 
@@ -168,29 +161,23 @@ selectHomeTab = function() {
 };
 
 
-/*
-getCurrentEmail = function() {
-    var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));
-    return userData.data.email;
-    };*/
-
-
 searchUser = function() {
     userEmail = document.getElementById("searchForm").elements.namedItem("searchEmail").value;
-    getProfile(userEmail);
+    getProfile(userEmail, false);
     selectHomeTab();
 };
 
-getProfile = function(userEmail) {
-    getUserData(userEmail);
-    getMessages(userEmail);
+getProfile = function(userEmail, currentUser) {
+    getUserData(userEmail, currentUser);
+    getMessages(userEmail, currentUser);
 };
 
-
-
-getUserData = function(userEmail) {
-    var userData = serverstub.getUserDataByEmail(localStorage.getItem('userToken'), userEmail);
-
+getUserData = function(userEmail, currentUser) {
+    if (currentUser) {
+	var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));	
+    } else {
+	var userData = serverstub.getUserDataByEmail(localStorage.getItem('userToken'), userEmail);	
+    }
 
     document.getElementById("userEmail").innerHTML = userData.data.email;
     document.getElementById("userFirstName").innerHTML = userData.data.firstname;
@@ -201,57 +188,11 @@ getUserData = function(userEmail) {
 
 };
 
-getCurrentProfile = function() {
-    getCurrentUserData();
-    getCurrentMessages();
-};
-
-getCurrentUserData = function() {
-    var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));
-
-    document.getElementById("userEmail").innerHTML = userData.data.email;
-    document.getElementById("userFirstName").innerHTML = userData.data.firstname;
-    document.getElementById("userFamilyName").innerHTML = userData.data.familyname;
-    document.getElementById("userGender").innerHTML = userData.data.gender;
-    document.getElementById("userCity").innerHTML = userData.data.city;
-    document.getElementById("userCountry").innerHTML = userData.data.country;     
-};
-
-getCurrentMessages = function() {
-    var messages = serverstub.getUserMessagesByToken(localStorage.getItem("userToken"));
-    var wall = document.getElementById("wall");
-
-    while (wall.hasChildNodes()) {   
-	wall.removeChild(wall.firstChild);
-    }
-    
-
-
-    for (i = 0; i < messages.data.length; i++) {
-	var tempDiv = document.createElement("div");
-	var message = document.createTextNode(messages.data[i].content);
-	var writer = document.createTextNode(messages.data[i].writer);
-	
-	tempDiv.className = "messageDiv";
-
-	wall.appendChild(tempDiv);
-	tempDiv.appendChild(message);
-	tempDiv.appendChild(document.createElement("br"));
-	tempDiv.appendChild(document.createTextNode(" posted by "));
-	tempDiv.appendChild(writer);
-	tempDiv.appendChild(document.createElement("br"))
-
-    }
-
-    console.log("hej det lyckades igen lol");
-};
-
-
 sendMessage = function() {
     
     var message = document.getElementById("postMessageForm").elements.namedItem("message").value;
     var token = localStorage.getItem("userToken");
-    var email = document.getElementById("userEmail").innerHTML;
+    var email = document.getElementById("userEmail").innerText;
     var sentMessage = serverstub.postMessage(token, message, email);
     
     if(!sentMessage.success){
@@ -260,15 +201,18 @@ sendMessage = function() {
 };
 
 
-getMessages = function(userEmail) {
-    var messages = serverstub.getUserMessagesByEmail(localStorage.getItem("userToken"), userEmail);
-    var wall = document.getElementById("wall");
+getMessages = function(userEmail, currentUser) {
+    var wall = document.getElementById("wall"); 
+
+    if (currentUser) {
+	var messages = serverstub.getUserMessagesByToken(localStorage.getItem("userToken"));	
+    } else {
+	var messages = serverstub.getUserMessagesByEmail(localStorage.getItem("userToken"), userEmail);		
+    }
 
     while (wall.hasChildNodes()) {   
 	wall.removeChild(wall.firstChild);
     }
-    
-
 
     for (i = 0; i < messages.data.length; i++) {
 	var tempDiv = document.createElement("div");

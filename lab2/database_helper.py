@@ -63,10 +63,9 @@ def checkPassword(inputEmail, password):
 
 def signInUser(token, email):
     c = get_db()
-    print "insert into loggedInUsers values ('" + token + "', '" + email + "')"
-    c.execute("insert into loggedInUsers values ('" + token + "', '" + email + "')")
+    c.execute("insert into loggedInUsers values (?, ?)", (token, email))
     c.commit()
-    c.close()
+
 
 
 def signUpUser(email, password, firstname, familyname, gender, city, country):
@@ -80,14 +79,27 @@ def signUpUser(email, password, firstname, familyname, gender, city, country):
         c.rollback()
         return False
 
-
-def getMessages(userEmail):
+def postMessage(token, content, toEmail):
     c = get_db()
+    cursor = c.cursor()
+    cursor.execute("SELECT email FROM loggedInUsers WHERE token like ?", (token,))
+    fromEmail = [row[0] for row in cursor.fetchall()][0]
+
+    print fromEmail
+
+    try:
+        c.execute("INSERT INTO messages values(?, ?, ?)", (toEmail, fromEmail, content))
+        c.commit()
+        return True
+    except:
+        c.rollback()
+        return False
+
 
 def testdb():
     c = get_db()
-    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden', '[]')")
-    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden', '[]')")
+    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
+    c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden')")
     c.commit()
     c.close()
    # c.execute("select * from users")
@@ -97,9 +109,11 @@ def testdb():
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
-    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT, messages TEXT)")
+    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
     c.execute("drop table if exists loggedInUsers")
     c.execute("CREATE TABLE loggedInUsers(token text primary key, email text, foreign key(email) references users(email))")
+    c.execute("drop table if exists messages")
+    c.execute("CREATE TABLE messages(recipient TEXT, writer TEXT, message TEXT, foreign key(recipient) references users(email), foreign key(writer) references users(email))")
     c.commit()
     print "database initalized"
 

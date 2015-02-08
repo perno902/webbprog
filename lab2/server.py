@@ -46,8 +46,18 @@ def generateToken():
     return token
 
 
-#@app.route('/signOut', methods=["POST"])
-#def signOut():
+@app.route('/postMessage', methods=["POST"])
+def postMessage():
+    print "postar meddelande"
+    if request.method == 'POST':
+        token = request.form['token']
+        content = request.form['content']
+        toEmail = request.form['toEmail']
+        if database_helper.postMessage(token, content, toEmail):
+            return json.dumps({"success": True, "message": "Lyckaddsfdsgdsfgsdes posta."})
+        else:
+            return json.dumps({"success": False, "message": "Lyckades EJ dfhjdfgposta."})
+
 
 
 #<email>/<password>/<firstname>/<familyname>/<gender>/<city>/<country>'

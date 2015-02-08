@@ -7,7 +7,7 @@ body {
 .totalSpace {
     position:relative;
     width: 600px;
-    height: 400px;
+    
     margin: 100px auto auto;
 
 }
@@ -125,9 +125,8 @@ p {
 #displayHome {
     float:right;
     width: 600px;
-    height: 400px;
     border:solid blue;
-    position:absolute;
+    /*position:absolute;*/
 }
 
 
@@ -185,8 +184,7 @@ p {
     float:left;
     margin-left: 20px;
     width: 400px;
-    height: 320px;
-    overflow: scroll;
+   /* height: 320px;*/
 }
 
 
@@ -219,7 +217,11 @@ p {
 
 }
 
+.messageDiv {
+    margin-top: 10px;
+    margin-bottom: 10px;
 
+}
 
 
 

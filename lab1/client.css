@@ -126,7 +126,8 @@ p {
     float:right;
     width: 600px;
     border:solid blue;
-    /*position:absolute;*/
+    min-height: 320px;
+    position:absolute;
 }
 
 
@@ -160,7 +161,6 @@ p {
 
 
 #personalInfo {
-    float:right;
     width: 130px;
     height: 190px;
     background-color:white;
@@ -183,16 +183,20 @@ p {
     background-color: white;
     float:left;
     margin-left: 20px;
+    margin-right: 30px;
+    margin-bottom: 30px;
     width: 400px;
-   /* height: 320px;*/
 }
 
+
+#homePanel {
+    float: right;
+}
 
 #reloadWallButton {
     width: 130px;
     height: 100px;
-    float: right;
-    bottom: 0px;
+   /* float: right;*/
 }
 
 #searchForm {
