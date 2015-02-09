@@ -63,12 +63,42 @@ def getUser(inputEmail):
     userInfo = [row[0] for row in cursor.fetchall()]
     return userInfo
 
-
 def getToken(inputEmail):
     c = get_db()
     cursor = c.cursor()
-    token = cursor.execute("select token from loggedInUsers where email like '" + inputEmail + "'")
-    return token
+    try:
+        cursor.execute("select * from loggedInUsers where email like ?", (inputEmail,))
+        userToken = [row[0] for row in cursor.fetchall()]
+        if len(userToken) != 0:
+            return userToken[0]
+        else:
+            print "No token with that email logged in."
+    except ValueError:
+        print "Something is off."
+
+def getToken(token):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select email from loggedInUsers where token like ?", (token,))
+    email = [row[0] for row in cursor.fetchall()][0]
+    return email
+
+def getMessages(userEmail):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select writer, message from messages where recipient like ?", (userEmail,))
+
+    firstElement = True
+    messageObj = "["
+    for row in cursor:
+        if not firstElement:
+            messageObj += ", "
+        else:
+            firstElement = False
+        messageObj += "{writer: " + row[0] + ", content: " + row[1] + "}"
+    messageObj += "]"
+
+    return messageObj
 
 
 def signOut(inputEmail):
@@ -90,8 +120,6 @@ def postMessage(token, content, toEmail):
     cursor.execute("SELECT email FROM loggedInUsers WHERE token like ?", (token,))
     fromEmail = [row[0] for row in cursor.fetchall()][0]
 
-    print fromEmail
-
     try:
         c.execute("INSERT INTO messages values(?, ?, ?)", (toEmail, fromEmail, content))
         c.commit()
@@ -99,7 +127,6 @@ def postMessage(token, content, toEmail):
     except:
         c.rollback()
         return False
-
 
 
 

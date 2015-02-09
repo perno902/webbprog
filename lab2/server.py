@@ -79,6 +79,20 @@ def postMessage():
         else:
             return json.dumps({"success": False, "message": "Lyckades EJ dfhjdfgposta."})
 
+@app.route('/getMessagesByToken/<token>', methods=["GET"])
+def getMessagesByToken(token):
+    if request.method == 'GET':
+        userEmail = database_helper.getToken(token)
+        messages = database_helper.getMessages(userEmail)
+        return json.dumps({"Success": True, "message": "User messages retrieved.", "data": messages})
+
+@app.route('/getMessagesByEmail', methods=["GET"])
+def getMessagesByEmail():
+    if request.method == 'GET':
+        # kolla om request.args.get('token') finns
+        userEmail = request.args.get('email')
+        messages = database_helper.getMessages(userEmail)
+        return json.dumps({"Success": True, "message": "User messages retrieved.", "data": messages})
 
 
 @app.route('/signOut', methods=['POST'])
