@@ -5,8 +5,8 @@ __author__ = 'wyz'
 import sqlite3
 from flask import g
 
-
-DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab2database.db"
+DATABASE = "C:\Users\cake\Dropbox\TDDD97\lab2\database.db"
+#DATABASE = "C:\Users\wyz\Dropbox\TDDD97\lab2\database.db"
 
 
 def connect_db():
@@ -32,14 +32,37 @@ def signUpUser(email, password, firstname, familyname, gender, city, country):
         return False
 
 
+def userExists(inputEmail):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select email from users where email like ?", (inputEmail,))
+    userInfo = [row[0] for row in cursor.fetchall()]
+    if len(userInfo) == 0:
+        return False
+    else:
+        return True
+
+
+def tokenExists(token):
+    c = get_db()
+    cursor = c.cursor()
+    try:
+        cursor.execute("select token from loggedInUsers where token = ?", (token,))
+        dbToken = [row[0] for row in cursor.fetchall()]
+        if token == dbToken:
+            return True
+    except:
+        print "Some error here."
+    return False
+
+
 def checkPassword(inputEmail, password):
     c = get_db()
     cursor = c.cursor()
-    cursor.execute("select password from users where email like '" + inputEmail + "'")
+    cursor.execute("select password from users where email like ?", (inputEmail,))
     pwList = [row[0] for row in cursor.fetchall()]
 
     if len(pwList) == 0:
-        print "inget hittades"
         return False
 
     dbPassword = pwList[0]
@@ -51,30 +74,13 @@ def checkPassword(inputEmail, password):
 
 def signInUser(token, email):
     c = get_db()
-    c.execute("insert into loggedInUsers values (?, ?)", (token, email))
+    print "insert into loggedInUsers values ('" + token + "', '" + email + "')"
+    try:
+        c.execute("insert into loggedInUsers values ('" + token + "', '" + email + "')")
+    except:
+        return False
     c.commit()
-
-
-
-def userExists(inputEmail):
-    c = get_db()
-    cursor = c.cursor()
-    cursor.execute("select email from users where email like ?", (inputEmail,))
-    userInfo = [row[0] for row in cursor.fetchall()]
-    if len(userInfo) == 0:
-        return False
-    else:
-        return True
-
-def userSignedIn(token):
-    c = get_db()
-    cursor = c.cursor()
-    cursor.execute("select email from loggedInUsers where token like ?", (token,))
-    userInfo = [row[0] for row in cursor.fetchall()]
-    if len(userInfo) == 0:
-        return False
-    else:
-        return True
+    c.close()
 
 
 def getToken(inputEmail):
@@ -90,99 +96,58 @@ def getToken(inputEmail):
     except ValueError:
         print "Something is off."
 
-def getEmail(token):
+
+def signOut(token):
+    c = get_db()
+    cursor = c.cursor()
+    try:
+        if len(token) != 0:
+            cursor.execute("delete from loggedInUsers where token like ?", (token,))
+            c.commit()
+            return True
+    except:
+            c.rollback()
+            return False
+
+
+def changePassword(token, oldPassword, newPassword):
     c = get_db()
     cursor = c.cursor()
     cursor.execute("select email from loggedInUsers where token like ?", (token,))
-    email = [row[0] for row in cursor.fetchall()]
-    if len(email) == 0:
-        return None
+    userEmail = [row[0] for row in cursor.fetchall()]
+
+    if not userEmail:
+        return False
+
+    if checkPassword(userEmail[0], oldPassword):
+        try:
+            cursor.execute("update users set password = ? where email like ?", (newPassword, userEmail[0]),)
+            c.commit()
+            return True
+        except:
+            return False
     else:
-        return email[0]
-
-def getMessages(userEmail):
-    c = get_db()
-    cursor = c.cursor()
-    cursor.execute("select writer, message from messages where recipient like ?", (userEmail,))
-
-    firstElement = True
-    messageObj = "["
-    for row in cursor:
-        if not firstElement:
-            messageObj += ", "
-        else:
-            firstElement = False
-        messageObj += "{writer: " + row[0] + ", content: " + row[1] + "}"
-    messageObj += "]"
-
-    return messageObj
-
-def getUserData(userEmail):
-    c = get_db()
-    cursor = c.cursor()
-    cursor.execute("select * from users where email like ?", (userEmail,))
-
-    for row in cursor:
-        dataObj = "{email: " + row[0] + ", firstname: " + row[2] + ", familyname: " + row[3] + ", gender: " + row[4] + ", city: " + row[5] + ", country: " + row[6] + "}"
-    return dataObj
-
-def signOut(inputEmail):
-    c = get_db()
-    cursor = c.cursor()
-
-    try:
-        cursor.execute("delete from loggedInUsers where email like '" + inputEmail + "%'")
-        c.commit()
-        return True
-    except:
-        c.rollback()
         return False
 
 
-def postMessage(token, content, toEmail):
-    c = get_db()
-    cursor = c.cursor()
-    cursor.execute("SELECT email FROM loggedInUsers WHERE token like ?", (token,))
-    fromEmail = [row[0] for row in cursor.fetchall()][0]
-
-    try:
-        c.execute("INSERT INTO messages values(?, ?, ?)", (toEmail, fromEmail, content))
-        c.commit()
-        return True
-    except:
-        c.rollback()
-        return False
-
-
-
-"""
 def testdb():
     c = get_db()
     c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
     c.execute("insert into users values('test2@gmail.com', 'test2', 'fname', 'famname', 'male', 'link', 'sweden')")
     c.commit()
     c.close()
-   # c.execute("select * from users")
 
-"""
+
+
 
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
     c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
     c.execute("drop table if exists loggedInUsers")
-
-    c.execute("CREATE TABLE loggedInUsers(token text primary key, email text, foreign key(email) references users(email))")
-    c.execute("drop table if exists messages")
-    c.execute("CREATE TABLE messages(recipient TEXT, writer TEXT, message TEXT, foreign key(recipient) references users(email), foreign key(writer) references users(email))")
-
-
-    # Row for testing purposes only:
-    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
-
+    c.execute("CREATE TABLE loggedInUsers(token TEXT, email text PRIMARY KEY , FOREIGN KEY(email) REFERENCES users(email))")
     c.commit()
     print "database initialized"
-
 
 
 def close():
