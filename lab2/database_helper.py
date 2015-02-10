@@ -90,12 +90,15 @@ def getToken(inputEmail):
     except ValueError:
         print "Something is off."
 
-def getToken(token):
+def getEmail(token):
     c = get_db()
     cursor = c.cursor()
     cursor.execute("select email from loggedInUsers where token like ?", (token,))
-    email = [row[0] for row in cursor.fetchall()][0]
-    return email
+    email = [row[0] for row in cursor.fetchall()]
+    if len(email) == 0:
+        return None
+    else:
+        return email[0]
 
 def getMessages(userEmail):
     c = get_db()
@@ -114,6 +117,14 @@ def getMessages(userEmail):
 
     return messageObj
 
+def getUserData(userEmail):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select * from users where email like ?", (userEmail,))
+
+    for row in cursor:
+        dataObj = "{email: " + row[0] + ", firstname: " + row[2] + ", familyname: " + row[3] + ", gender: " + row[4] + ", city: " + row[5] + ", country: " + row[6] + "}"
+    return dataObj
 
 def signOut(inputEmail):
     c = get_db()

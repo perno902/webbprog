@@ -92,17 +92,51 @@ def postMessage():
 @app.route('/getMessagesByToken/<token>', methods=["GET"])
 def getMessagesByToken(token):
     if request.method == 'GET':
-        userEmail = database_helper.getToken(token)
-        messages = database_helper.getMessages(userEmail)
-        return json.dumps({"Success": True, "message": "User messages retrieved.", "data": messages})
+        userEmail = database_helper.getEmail(token)
+        return getMessages(token, userEmail)
 
 @app.route('/getMessagesByEmail', methods=["GET"])
 def getMessagesByEmail():
     if request.method == 'GET':
-        # kolla om request.args.get('token') finns
+        token = request.args.get('token')
         userEmail = request.args.get('email')
-        messages = database_helper.getMessages(userEmail)
-        return json.dumps({"Success": True, "message": "User messages retrieved.", "data": messages})
+        return getMessages(token, userEmail)
+
+
+def getMessages(token, userEmail):
+    if database_helper.userSignedIn(token):
+        if database_helper.userExists(userEmail):
+            messages = database_helper.getMessages(userEmail)
+            return json.dumps({"Success": True, "message": "User messages retrieved.", "data": messages})
+        else:
+            return json.dumps({"Success": False, "message": "Nu such user."})
+    else:
+        return json.dumps({"Success": False, "message": "You are not signed in."})
+
+
+@app.route('/getUserDataByToken/<token>', methods=["GET"])
+def getUserDataByToken(token):
+    if request.method == 'GET':
+        userEmail = database_helper.getEmail(token)
+        return getUserData(token, userEmail)
+
+@app.route('/getUserDataByEmail', methods=["GET"])
+def getUserDataByEmail():
+     if request.method == 'GET':
+        token = request.args.get('token')
+        userEmail = request.args.get('email')
+        return getUserData(token, userEmail)
+
+def getUserData(token, userEmail):
+    if database_helper.userSignedIn(token):
+        if database_helper.userExists(userEmail):
+            userData = database_helper.getUserData(userEmail)
+            return json.dumps({"Success": True, "message": "User data retrieved.", "data": userData})
+        else:
+            return json.dumps({"Success": False, "message": "Nu such user."})
+    else:
+        return json.dumps({"Success": False, "message": "You are not signed in."})
+
 
 
 @app.route('/signOut', methods=['POST'])
