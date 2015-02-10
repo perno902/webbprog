@@ -56,12 +56,26 @@ def signInUser(token, email):
 
 
 
-def getUser(inputEmail):
+def userExists(inputEmail):
     c = get_db()
     cursor = c.cursor()
-    user = cursor.execute("select email from loggedInUsers where email like '" + inputEmail + "'")
+    cursor.execute("select email from users where email like ?", (inputEmail,))
     userInfo = [row[0] for row in cursor.fetchall()]
-    return userInfo
+    if len(userInfo) == 0:
+        return False
+    else:
+        return True
+
+def userSignedIn(token):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select email from loggedInUsers where token like ?", (token,))
+    userInfo = [row[0] for row in cursor.fetchall()]
+    if len(userInfo) == 0:
+        return False
+    else:
+        return True
+
 
 def getToken(inputEmail):
     c = get_db()

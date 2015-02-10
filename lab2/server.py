@@ -69,15 +69,25 @@ def generateToken():
 
 @app.route('/postMessage', methods=["POST"])
 def postMessage():
-    print "postar meddelande"
     if request.method == 'POST':
         token = request.form['token']
         content = request.form['content']
         toEmail = request.form['toEmail']
-        if database_helper.postMessage(token, content, toEmail):
-            return json.dumps({"success": True, "message": "Lyckaddsfdsgdsfgsdes posta."})
+
+        if database_helper.userSignedIn(token):
+            if database_helper.userExists(toEmail):
+                if database_helper.postMessage(token, content, toEmail):
+                    return json.dumps({"success": True, "message": "Message posted."})
+                else:
+                    return json.dumps({"success": False, "message": "Failed to post message"})
+            else:
+                return json.dumps({"success": False, "message": "Nu such user."})
         else:
-            return json.dumps({"success": False, "message": "Lyckades EJ dfhjdfgposta."})
+            return json.dumps({"success": False, "message": "You are not signed in"})
+
+
+
+
 
 @app.route('/getMessagesByToken/<token>', methods=["GET"])
 def getMessagesByToken(token):
