@@ -100,17 +100,17 @@ function sendForm(){
 
 
 loginForm = function(){
-    var username = document.getElementById("loginForm").elements.namedItem("username").value;
-    var password = document.getElementById("loginForm").elements.namedItem("password").value;
+    var e = document.getElementById("loginForm");
+    var formData = new FormData();
+    formData.append("email", e.elements.namedItem("username").value);
+    formData.append("password", e.elements.namedItem("password").value);
+
 
     var url = "/signIn";
-
     var xmlhttp = new XMLHttpRequest();
 
-
     xmlhttp.open("POST", url, true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.send("email=test&password=test");
+    xmlhttp.send(formData);
 
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState==4 && xmlhttp.status==200) {

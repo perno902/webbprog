@@ -104,10 +104,8 @@ def signIn():
         if database_helper.checkPassword(email, password):
             token = generateToken()
             database_helper.signInUser(token, email)
-            print "lyckas"
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
-            print "missyckas"
             return json.dumps({"success": False, "message": "Wrong username or password."})
 
 
