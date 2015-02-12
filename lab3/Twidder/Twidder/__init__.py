@@ -5,14 +5,14 @@ import database_helper
 import json, random, re
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 app.debug = True
 
 @app.route('/')
 def hello():
     database_helper.init_db()
+    return app.send_static_file('client.html')
 
-    return "world, hello"
 
 def validEmail(email):
     if re.match("[^@]+@[^@]+\.[^@]+", email):

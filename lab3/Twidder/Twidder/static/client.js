@@ -54,15 +54,25 @@ checkEmail = function(email){
 };
 
 
-sendForm = function(){
+function sendForm(){
+    var xmlhttp;
 
     var e = document.getElementById("signUpForm");
     var d = document.getElementById("genderSelect");
 
     checkEmail(e.elements.namedItem("email").value);
-    //console.log(checkEmail(e.elements.namedItem("email").value));
 
-        var formData = {
+    var formData = new FormData();
+    formData.append("email", e.elements.namedItem("email").value);
+    formData.append("password", e.elements.namedItem("password").value);
+    formData.append("firstname", e.elements.namedItem("firstname").value);
+    formData.append("familyname",e.elements.namedItem("familyname").value);
+    formData.append("gender", d.options[d.selectedIndex].text);
+    formData.append("city", e.elements.namedItem("city").value);
+    formData.append("country", e.elements.namedItem("country").value);
+
+
+/*
             email: e.elements.namedItem("email").value,
             password: e.elements.namedItem("password").value,
             firstname: e.elements.namedItem("firstname").value,
@@ -70,14 +80,23 @@ sendForm = function(){
             gender: d.options[d.selectedIndex].text,
             city: e.elements.namedItem("city").value,
             country: e.elements.namedItem("country").value
-        };
 
+*/
     if(validateForm()){
-        var result = serverstub.signUp(formData);
-    	document.getElementById("signupMessage").innerHTML = result.message;
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST","http://127.0.0.1:5000/signUp","false");
+        xmlhttp.send(formData);
+        //var result = serverstub.signUp(formData);
+
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                document.getElementById("signupMessage").innerHTML = JSON.parse(xmlhttp.responseText).message;
+            }
+        };
+        return false;
     }
-    return false;
-};
+
+}
 
 
 loginForm = function(){
