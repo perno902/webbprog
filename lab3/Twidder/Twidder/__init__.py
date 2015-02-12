@@ -8,6 +8,7 @@ import json, random, re
 app = Flask(__name__, static_url_path='')
 app.debug = True
 
+
 @app.route('/')
 def hello():
     database_helper.init_db()
@@ -95,15 +96,23 @@ def changePassword():
 
 @app.route('/signIn', methods=["POST"])
 def signIn():
+    print "tries to sign in!"
     if request.method == 'POST':
 
         email = request.form['email']
         password = request.form['password']
+        print "innan check password"
+        print database_helper.checkPassword(email, password)
         if database_helper.checkPassword(email, password):
+            print "efter check password"
             token = generateToken()
+            print token
             database_helper.signInUser(token, email)
+            print database_helper.signInUser(token, email)
+            print "lyckas"
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
+            print "missyckas"
             return json.dumps({"success": False, "message": "Wrong username or password."})
 
 

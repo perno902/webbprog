@@ -43,7 +43,6 @@ def signInUser(token, email):
         c.rollback()
 
 
-
 def userExists(inputEmail):
     c = get_db()
     cursor = c.cursor()
@@ -53,6 +52,7 @@ def userExists(inputEmail):
         return False
     else:
         return True
+
 
 def userSignedIn(token):
     c = get_db()
@@ -75,6 +75,7 @@ def getEmail(token):
     else:
         return email[0]
 
+
 def getMessages(userEmail):
     c = get_db()
     cursor = c.cursor()
@@ -91,6 +92,7 @@ def getMessages(userEmail):
     messageObj += "]"
 
     return messageObj
+
 
 def getUserData(userEmail):
     c = get_db()

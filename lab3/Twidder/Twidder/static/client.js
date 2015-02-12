@@ -103,15 +103,28 @@ loginForm = function(){
     var username = document.getElementById("loginForm").elements.namedItem("username").value;
     var password = document.getElementById("loginForm").elements.namedItem("password").value;
 
-    var result = serverstub.signIn(username, password);
+    var url = "/signIn";
 
-    if(!result.success){
-	    document.getElementById("loginMessage").innerHTML = result.message;
-    }else{
-	    document.getElementById("loginMessage").innerHTML = "";
-        localStorage.setItem("userToken", result.data);
-        displayView();
-    }
+    var xmlhttp = new XMLHttpRequest();
+
+
+    xmlhttp.open("POST", url, true);
+    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlhttp.send("email=test&password=test");
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            result = JSON.parse(xmlhttp.responseText);
+
+            if(!result.success){
+	            document.getElementById("loginMessage").innerHTML = result.message;
+            }else {
+                document.getElementById("loginMessage").innerHTML = "";
+                localStorage.setItem("userToken", result.data);
+                displayView();
+            }
+        }
+    };
 };
 
 logout = function(){
@@ -221,7 +234,7 @@ sendMessage = function() {
 
 
 getMessages = function(userEmail, currentUser) {
-    var wall = document.getElementById("wall"); 
+    var wall = document.getElementById("wall");
 
     if (currentUser) {
 	var messages = serverstub.getUserMessagesByToken(localStorage.getItem("userToken"));	
