@@ -15,7 +15,6 @@ def hello():
     return app.send_static_file('client.html')
 
 
-
 def validEmail(email):
     if re.match("[^@]+@[^@]+\.[^@]+", email):
         return True

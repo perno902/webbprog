@@ -8,6 +8,7 @@ from flask import g
 
 
 DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab3\Twidder\Twidder\DATABASE.db"
+#DATABASE = "C:\Users\cake\Desktop\webprog\webbprog\lab3\Twidder\Twidder\DATABASE.db"
 
 
 def connect_db():
