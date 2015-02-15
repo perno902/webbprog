@@ -4,6 +4,7 @@ __author__ = 'wyz'
 
 import sqlite3
 from flask import g
+import json
 
 
 
@@ -80,17 +81,10 @@ def getMessages(userEmail):
     cursor = c.cursor()
     cursor.execute("select writer, message from messages where recipient like ?", (userEmail,))
 
-    firstElement = True
-    messageObj = "["
+    messageObj = []
     for row in cursor:
-        if not firstElement:
-            messageObj += ", "
-        else:
-            firstElement = False
-        messageObj += "{writer: " + row[0] + ", content: " + row[1] + "}"
-    messageObj += "]"
-
-    return messageObj
+        messageObj.append({"writer": row[0], "content": row[1]})
+    return json.dumps(messageObj)
 
 def getUserData(userEmail):
     c = get_db()
@@ -98,7 +92,7 @@ def getUserData(userEmail):
     cursor.execute("select * from users where email like ?", (userEmail,))
 
     for row in cursor:
-        dataObj = "{email: " + row[0] + ", firstname: " + row[2] + ", familyname: " + row[3] + ", gender: " + row[4] + ", city: " + row[5] + ", country: " + row[6] + "}"
+        dataObj = json.dumps ({"email": row[0], "firstname": row[2] ,"familyname": row[3], "gender": row[4], "city": row[5], "country": row[6]})
     return dataObj
 
 
@@ -192,8 +186,10 @@ def init_db():
     c.execute("CREATE TABLE messages(recipient TEXT, writer TEXT, message TEXT, foreign key(recipient) references users(email), foreign key(writer) references users(email))")
 
 
-    # Row for testing purposes only:
+    # Rows for testing purposes only:
     c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
+    c.execute("insert into users values ('test2@gmail.com', 'test2', 'fname2', 'famname2', 'male', 'norrk', 'norway')")
+    c.execute("insert into loggedInUsers values ('DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb', 'test@gmail.com')")
 
     c.commit()
     print "database initialized"

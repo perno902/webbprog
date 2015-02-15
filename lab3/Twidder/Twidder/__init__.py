@@ -151,11 +151,11 @@ def getMessages(token, userEmail):
     if database_helper.userSignedIn(token):
         if database_helper.userExists(userEmail):
             messages = database_helper.getMessages(userEmail)
-            return json.dumps({"Success": True, "message": "User messages retrieved.", "data": messages})
+            return json.dumps({"success": True, "message": "User messages retrieved.", "data": messages})
         else:
-            return json.dumps({"Success": False, "message": "Nu such user."})
+            return json.dumps({"success": False, "message": "Nu such user."})
     else:
-        return json.dumps({"Success": False, "message": "You are not signed in."})
+        return json.dumps({"success": False, "message": "You are not signed in."})
 
 
 @app.route('/getUserDataByToken/<token>', methods=["GET"])
@@ -175,11 +175,11 @@ def getUserData(token, userEmail):
     if database_helper.userSignedIn(token):
         if database_helper.userExists(userEmail):
             userData = database_helper.getUserData(userEmail)
-            return json.dumps({"Success": True, "message": "User data retrieved.", "data": userData})
+            return json.dumps({"success": True, "message": "User data retrieved.", "data": userData})
         else:
-            return json.dumps({"Success": False, "message": "Nu such user."})
+            return json.dumps({"success": False, "message": "Nu such user."})
     else:
-        return json.dumps({"Success": False, "message": "You are not signed in."})
+        return json.dumps({"success": False, "message": "You are not signed in."})
 
 
 
