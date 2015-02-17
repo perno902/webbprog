@@ -80,38 +80,26 @@ def signOut():
 @app.route('/changePassword', methods=['POST'])
 def changePassword():
     if request.method == 'POST':
-        print "enteres changePassword"
         token = request.form['token']
         oldPassword = request.form['oldPassword']
         newPassword = request.form['newPassword']
-        print "token: " + token
-        print "oldpw: " + oldPassword
-        print "newpw: " + newPassword
         if not validPassword(newPassword):
             return json.dumps({"success": False, "message": "Password must be 4 characters or more."})
 
         if database_helper.changePassword(token, oldPassword, newPassword):
-            print "kommer if"
             return json.dumps({"success": True, "message": "Successfully changed password."})
         else:
-            print "kommer else"
             return json.dumps({"success": False, "message": "Could not change password."})
 
 
 
 @app.route('/signIn', methods=["POST"])
 def signIn():
-    print "tries to sign in!"
     if request.method == 'POST':
-
         email = request.form['email']
         password = request.form['password']
-        print "innan check password"
-        print database_helper.checkPassword(email, password)
         if database_helper.checkPassword(email, password):
-            print "efter check password"
             token = generateToken()
-            print token
             database_helper.signInUser(token, email)
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
