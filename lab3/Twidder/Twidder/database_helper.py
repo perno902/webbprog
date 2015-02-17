@@ -163,9 +163,12 @@ def changePassword(token, oldPassword, newPassword):
     cursor.execute("select email from loggedInUsers where token like ?", (token,))
     userEmail = [row[0] for row in cursor.fetchall()]
 
+
     if not userEmail:
         return False
-
+    print "i databasen:"
+    print oldPassword
+    print newPassword
     if checkPassword(userEmail[0], oldPassword):
         try:
             cursor.execute("update users set password = ? where email like ?", (newPassword, userEmail[0]),)

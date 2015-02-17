@@ -84,7 +84,7 @@ function sendForm(){
 */
     if(validateForm()){
         xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST","http://127.0.0.1:5000/signUp",false);
+        xmlhttp.open("POST","http://127.0.0.1:5000/signUp",true);
         xmlhttp.send(formData);
         //var result = serverstub.signUp(formData);
 
@@ -129,35 +129,51 @@ loginForm = function(){
 
 logout = function(){
 
+    var formData = new FormData();
+    formData.append("token", localStorage.getItem('userToken'));
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("POST", "http://127.0.0.1:5000/logOut","false", true);
-    xmlhttp.send(localStorage.getItem('userToken'));
+    xmlhttp.open("POST", "http://127.0.0.1:5000/signOut", true);
+    xmlhttp.send(formData);
 
-    serverstub.signOut(localStorage.getItem('userToken'));
+    //serverstub.signOut(localStorage.getItem('userToken'));
     localStorage.removeItem('userToken');
     displayView();
 };
 
 
 changePassword = function(){
+
+    var formData = new FormData();
+    formData.append("token", localStorage.getItem('userToken'));
+    formData.append("oldPassword", document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value);
+    formData.append("newPassword", document.getElementById("changePasswordForm").elements.namedItem("newPassword").value);
+    var changePasswordText = document.getElementById("changePasswordText");
+
     var oldPassword = document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value;
     var newPassword = document.getElementById("changePasswordForm").elements.namedItem("newPassword").value;
-    var token = localStorage.getItem('userToken');
-    var changePasswordText = document.getElementById("changePasswordText");
+
 
     if(checkPasswordLength(newPassword)) {
         changePasswordText.innerHTML="Password has to be 4 characters or more";
     }else if(oldPassword == newPassword) {
         changePasswordText.innerHTML="You picked the same password. Please pick another.";
     }
-    else{
-        var result = serverstub.changePassword(token, oldPassword, newPassword);
-        if(result.success){
-            changePasswordText.innerHTML=result.message;
-            return true;
-        }else if(!result.success){
-            changePasswordText.innerHTML=result.message;
-            return false;
+    else {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", "http://127.0.0.1:5000/changePassword", true);
+        xmlhttp.send(formData);
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                var result = JSON.parse(xmlhttp.responseText);
+
+                if (result.success) {
+                    changePasswordText.innerHTML = result.message;
+                    return true;
+                } else if (!result.success) {
+                    changePasswordText.innerHTML = result.message;
+                    return false;
+                }
+            }
         }
     }
 };
