@@ -84,7 +84,7 @@ function sendForm(){
 */
     if(validateForm()){
         xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST","http://127.0.0.1:5000/signUp","false");
+        xmlhttp.open("POST","http://127.0.0.1:5000/signUp",false);
         xmlhttp.send(formData);
         //var result = serverstub.signUp(formData);
 
@@ -128,6 +128,11 @@ loginForm = function(){
 };
 
 logout = function(){
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", "http://127.0.0.1:5000/logOut","false", true);
+    xmlhttp.send(localStorage.getItem('userToken'));
+
     serverstub.signOut(localStorage.getItem('userToken'));
     localStorage.removeItem('userToken');
     displayView();
@@ -205,60 +210,118 @@ getProfile = function(userEmail, currentUser) {
 };
 
 getUserData = function(userEmail, currentUser) {
+
+    //var token = localStorage.getItem('userToken');
+    var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
+
     if (currentUser) {
-	var userData = serverstub.getUserDataByToken(localStorage.getItem('userToken'));	
+        var url = "/getUserDataByToken/" + token;
     } else {
-	var userData = serverstub.getUserDataByEmail(localStorage.getItem('userToken'), userEmail);	
+        var url = "/getUserDataByEmail?token=" + token + "&email=" + userEmail;
     }
 
-    document.getElementById("userEmail").innerHTML = userData.data.email;
-    document.getElementById("userFirstName").innerHTML = userData.data.firstname;
-    document.getElementById("userFamilyName").innerHTML = userData.data.familyname;
-    document.getElementById("userGender").innerHTML = userData.data.gender;
-    document.getElementById("userCity").innerHTML = userData.data.city;
-    document.getElementById("userCountry").innerHTML = userData.data.country;  
+
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            result = JSON.parse(xmlhttp.responseText);
+            if (!result.success) {
+                console.log(result.message);
+            } else {
+                setUserData(JSON.parse(result.data));
+            }
+        }
+    };
+};
+
+setUserData = function(userData) {
+    document.getElementById("userEmail").innerHTML = userData.email;
+    document.getElementById("userFirstName").innerHTML = userData.firstname;
+    document.getElementById("userFamilyName").innerHTML = userData.familyname;
+    document.getElementById("userGender").innerHTML = userData.gender;
+    document.getElementById("userCity").innerHTML = userData.city;
+    document.getElementById("userCountry").innerHTML = userData.country;
 
 };
 
 sendMessage = function() {
-    
-    var message = document.getElementById("postMessageForm").elements.namedItem("message").value;
-    var token = localStorage.getItem("userToken");
-    var email = document.getElementById("userEmail").innerText;
-    var sentMessage = serverstub.postMessage(token, message, email);
-    
-    if(!sentMessage.success){
-	window.alert(sentMessage.message);
-    }
+    var formData = new FormData();
+
+    //formData.append("token", localStorage.getItem("userToken"));
+    formData.append("token", 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb')
+    formData.append("content", document.getElementById("postMessageForm").elements.namedItem("message").value);
+    formData.append("toEmail", document.getElementById("userEmail").innerText);
+
+    var url = "/postMessage";
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("POST", url, true);
+    xmlhttp.send(formData);
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            result = JSON.parse(xmlhttp.responseText);
+            if(!result.success){
+	            console.log(result.message);
+            }else {
+                console.log(result.message);
+            }
+        }
+    };
+
+
+
 };
 
 
 getMessages = function(userEmail, currentUser) {
     var wall = document.getElementById("wall");
 
+    //var token = localStorage.getItem('userToken');
+    var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
+
     if (currentUser) {
-	var messages = serverstub.getUserMessagesByToken(localStorage.getItem("userToken"));	
+        var url = "/getMessagesByToken/" + token;
     } else {
-	var messages = serverstub.getUserMessagesByEmail(localStorage.getItem("userToken"), userEmail);		
+        var url = "/getMessagesByEmail?token=" + token + "&email=" + userEmail;
     }
 
-    while (wall.hasChildNodes()) {   
-	wall.removeChild(wall.firstChild);
-    }
+    var xmlhttp = new XMLHttpRequest();
 
-    for (i = 0; i < messages.data.length; i++) {
-	var tempDiv = document.createElement("div");
-	var message = document.createTextNode(messages.data[i].content);
-	var writer = document.createTextNode(messages.data[i].writer);
-	
-	tempDiv.className = "messageDiv";
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
 
-	wall.appendChild(tempDiv);
-	tempDiv.appendChild(message);
-	tempDiv.appendChild(document.createElement("br"));
-	tempDiv.appendChild(document.createTextNode(" posted by "));
-	tempDiv.appendChild(writer);
-	tempDiv.appendChild(document.createElement("br"))
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            result = JSON.parse(xmlhttp.responseText);
+            if (!result.success) {
+                console.log(result.message);
+            } else {
+                var messages = JSON.parse(result.data);
 
-    }
+                while (wall.hasChildNodes()) {
+                    wall.removeChild(wall.firstChild);
+                }
+
+                for (i = 0; i < messages.length; i++) {
+                    var tempDiv = document.createElement("div");
+                    var message = document.createTextNode(messages[i].content);
+                    var writer = document.createTextNode(messages[i].writer);
+
+                    tempDiv.className = "messageDiv";
+
+                    wall.appendChild(tempDiv);
+                    tempDiv.appendChild(message);
+                    tempDiv.appendChild(document.createElement("br"));
+                    tempDiv.appendChild(document.createTextNode(" posted by "));
+                    tempDiv.appendChild(writer);
+                    tempDiv.appendChild(document.createElement("br"))
+                }
+            }
+        }
+    };
 };
