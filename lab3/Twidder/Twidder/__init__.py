@@ -69,12 +69,12 @@ def signOut():
         token = request.form['token']
         email = database_helper.getEmail(token)
         if not database_helper.userExists(email):
-            return json.dumps({"Success": False, "message": "No such user logged in."})
+            return json.dumps({"success": False, "message": "No such user logged in."})
 
         if database_helper.signOut(token):
-            return json.dumps({"Success": True, "message": "Successfully logged out."})
+            return json.dumps({"success": True, "message": "Successfully logged out."})
         else:
-            return json.dumps({"Success": False, "message": "Could not log out."})
+            return json.dumps({"success": False, "message": "Could not log out."})
 
 
 @app.route('/changePassword', methods=['POST'])
@@ -83,22 +83,19 @@ def changePassword():
         token = request.form['token']
         oldPassword = request.form['oldPassword']
         newPassword = request.form['newPassword']
-        print validPassword(newPassword)
         if not validPassword(newPassword):
             return json.dumps({"success": False, "message": "Password must be 4 characters or more."})
 
         if database_helper.changePassword(token, oldPassword, newPassword):
-            return json.dumps({"Success": True, "message": "Successfully changed password."})
+            return json.dumps({"success": True, "message": "Successfully changed password."})
         else:
-            return json.dumps({"Success": False, "message": "Could not change password."})
+            return json.dumps({"success": False, "message": "Could not change password."})
 
 
 
 @app.route('/signIn', methods=["POST"])
 def signIn():
-    print "tries to sign in!"
     if request.method == 'POST':
-
         email = request.form['email']
         password = request.form['password']
         if database_helper.checkPassword(email, password):

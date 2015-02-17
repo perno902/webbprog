@@ -72,21 +72,10 @@ function sendForm(){
     formData.append("country", e.elements.namedItem("country").value);
 
 
-/*
-            email: e.elements.namedItem("email").value,
-            password: e.elements.namedItem("password").value,
-            firstname: e.elements.namedItem("firstname").value,
-            familyname: e.elements.namedItem("familyname").value,
-            gender: d.options[d.selectedIndex].text,
-            city: e.elements.namedItem("city").value,
-            country: e.elements.namedItem("country").value
-
-*/
     if(validateForm()){
         xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST","http://127.0.0.1:5000/signUp","false");
+        xmlhttp.open("POST","http://127.0.0.1:5000/signUp",true);
         xmlhttp.send(formData);
-        //var result = serverstub.signUp(formData);
 
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -128,38 +117,57 @@ loginForm = function(){
 };
 
 logout = function(){
-    serverstub.signOut(localStorage.getItem('userToken'));
+
+    var formData = new FormData();
+    formData.append("token", localStorage.getItem('userToken'));
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", "http://127.0.0.1:5000/signOut", true);
+    xmlhttp.send(formData);
+
     localStorage.removeItem('userToken');
     displayView();
 };
 
 
 changePassword = function(){
+
+    var formData = new FormData();
+    formData.append("token", localStorage.getItem('userToken'));
+    formData.append("oldPassword", document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value);
+    formData.append("newPassword", document.getElementById("changePasswordForm").elements.namedItem("newPassword").value);
+    var changePasswordText = document.getElementById("changePasswordText");
+
     var oldPassword = document.getElementById("changePasswordForm").elements.namedItem("oldPassword").value;
     var newPassword = document.getElementById("changePasswordForm").elements.namedItem("newPassword").value;
-    var token = localStorage.getItem('userToken');
-    var changePasswordText = document.getElementById("changePasswordText");
+
 
     if(checkPasswordLength(newPassword)) {
         changePasswordText.innerHTML="Password has to be 4 characters or more";
     }else if(oldPassword == newPassword) {
         changePasswordText.innerHTML="You picked the same password. Please pick another.";
     }
-    else{
-        var result = serverstub.changePassword(token, oldPassword, newPassword);
-        if(result.success){
-            changePasswordText.innerHTML=result.message;
-            return true;
-        }else if(!result.success){
-            changePasswordText.innerHTML=result.message;
-            return false;
+    else {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", "http://127.0.0.1:5000/changePassword", true);
+        xmlhttp.send(formData);
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                var result = JSON.parse(xmlhttp.responseText);
+
+                if (result.success) {
+                    changePasswordText.innerHTML = result.message;
+                    return true;
+                } else if (!result.success) {
+                    changePasswordText.innerHTML = result.message;
+                    return false;
+                }
+            }
         }
     }
 };
 
 selectTab = function(item){
 
-    console.log(item.id);
 
     var changePasswordText = document.getElementById("changePasswordText");
     changePasswordText.innerHTML ="";
@@ -204,9 +212,8 @@ getProfile = function(userEmail, currentUser) {
 };
 
 getUserData = function(userEmail, currentUser) {
-
-    //var token = localStorage.getItem('userToken');
-    var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
+    var token = localStorage.getItem('userToken');
+    //var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
     var result;
 
     if (currentUser) {
@@ -247,8 +254,8 @@ setUserData = function(userData) {
 sendMessage = function() {
     var formData = new FormData();
 
-    //formData.append("token", localStorage.getItem("userToken"));
-    formData.append("token", 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb')
+    formData.append("token", localStorage.getItem("userToken"));
+    //formData.append("token", 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb')
     formData.append("content", document.getElementById("postMessageForm").elements.namedItem("message").value);
     formData.append("toEmail", document.getElementById("userEmail").innerText);
 
@@ -277,8 +284,8 @@ sendMessage = function() {
 getMessages = function(userEmail, currentUser) {
     var wall = document.getElementById("wall");
 
-    //var token = localStorage.getItem('userToken');
-    var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
+    var token = localStorage.getItem('userToken');
+    //var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
 
     if (currentUser) {
         var url = "/getMessagesByToken/" + token;

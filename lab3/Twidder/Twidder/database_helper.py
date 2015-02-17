@@ -8,8 +8,8 @@ import json
 
 
 
-DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab3\Twidder\Twidder\DATABASE.db"
-#DATABASE = "C:\Users\cake\Desktop\webprog\webbprog\lab3\Twidder\Twidder\DATABASE.db"
+#DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab3\Twidder\Twidder\DATABASE.db"
+DATABASE = "C:\Users\cake\Desktop\webprog\webbprog\lab3\Twidder\Twidder\DATABASE.db"
 
 
 def connect_db():
@@ -44,7 +44,6 @@ def signInUser(token, email):
         c.rollback()
 
 
-
 def userExists(inputEmail):
     c = get_db()
     cursor = c.cursor()
@@ -54,6 +53,7 @@ def userExists(inputEmail):
         return False
     else:
         return True
+
 
 def userSignedIn(token):
     c = get_db()
@@ -76,6 +76,7 @@ def getEmail(token):
     else:
         return email[0]
 
+
 def getMessages(userEmail):
     c = get_db()
     cursor = c.cursor()
@@ -85,6 +86,7 @@ def getMessages(userEmail):
     for row in cursor:
         messageObj.append({"writer": row[0], "content": row[1]})
     return json.dumps(messageObj)
+
 
 def getUserData(userEmail):
     c = get_db()
@@ -154,7 +156,6 @@ def signOut(token):
             return False
 
 
-
 def changePassword(token, oldPassword, newPassword):
     c = get_db()
     cursor = c.cursor()
@@ -163,7 +164,6 @@ def changePassword(token, oldPassword, newPassword):
 
     if not userEmail:
         return False
-
     if checkPassword(userEmail[0], oldPassword):
         try:
             cursor.execute("update users set password = ? where email like ?", (newPassword, userEmail[0]),)
@@ -193,7 +193,6 @@ def init_db():
 
     c.commit()
     print "database initialized"
-
 
 
 def close():
