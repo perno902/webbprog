@@ -196,7 +196,6 @@ selectHomeTab = function() {
 searchUser = function() {
     userEmail = document.getElementById("searchForm").elements.namedItem("searchEmail").value;
     getProfile(userEmail, false);
-    selectHomeTab();
 };
 
 getProfile = function(userEmail, currentUser) {
@@ -208,6 +207,7 @@ getUserData = function(userEmail, currentUser) {
 
     //var token = localStorage.getItem('userToken');
     var token = 'DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb';
+    var result;
 
     if (currentUser) {
         var url = "/getUserDataByToken/" + token;
@@ -225,12 +225,13 @@ getUserData = function(userEmail, currentUser) {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             result = JSON.parse(xmlhttp.responseText);
             if (!result.success) {
-                console.log(result.message);
+                document.getElementById("browseMessage").innerHTML = result.message;
             } else {
                 setUserData(JSON.parse(result.data));
             }
         }
     };
+
 };
 
 setUserData = function(userData) {
@@ -294,7 +295,7 @@ getMessages = function(userEmail, currentUser) {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             result = JSON.parse(xmlhttp.responseText);
             if (!result.success) {
-                console.log(result.message);
+                document.getElementById("browseMessage").innerHTML = result.message;
             } else {
                 var messages = JSON.parse(result.data);
 
@@ -316,6 +317,9 @@ getMessages = function(userEmail, currentUser) {
                     tempDiv.appendChild(writer);
                     tempDiv.appendChild(document.createElement("br"))
                 }
+
+                document.getElementById("browseMessage").innerHTML = "";
+                selectHomeTab();
             }
         }
     };
