@@ -1,9 +1,15 @@
 __author__ = 'wyz'
 
 from flask import Flask, request, app
+import greenlet
+from gevent.wsgi import WSGIServer
+import gevent
+from gevent import pywsgi
+#from gevent import geventwebsocket
+# import WebSocketServer, WebSocketApplication, Resource
+
 import database_helper
 import json, random, re
-
 
 app = Flask(__name__, static_url_path='')
 app.debug = True
@@ -186,4 +192,5 @@ def teardown_app(exception):
 
 
 if __name__ == '__main__':
-    app.run()
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()

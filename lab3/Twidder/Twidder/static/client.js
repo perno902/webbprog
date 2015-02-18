@@ -1,3 +1,29 @@
+
+/*
+connect = function(){
+    try{
+        var socket;
+        var host = "http://127.0.0.1:5000/";
+        var socket = new WebSocket(host);
+        socket.onopen = function(){
+            message('<p class="event">Socket Status: '+socket.readyState);
+        };
+        socket.onmessage = function(msg){
+       		 message('<p class="message">Received: '+msg.data);
+        };
+
+        socket.onclose = function(){
+       		 message('<p class="event">Socket Status: '+socket.readyState+' (Closed)');
+        };
+
+    } catch(exception){
+   		 message('<p>Error'+exception);
+    }
+    };
+
+
+}*/
+
 displayView = function(){
    //the code required to display view
     if(localStorage.getItem("userToken")){
@@ -9,12 +35,15 @@ displayView = function(){
 };
 
 window.onload = function(){
-    displayView();
+    var websocket = new WebSocket("http://127.0.0.1:5000/", "");
+    websocket.send(displayView());
+    //displayView();
 };
 
 
 
 validateForm = function(){
+
 
     var password = document.getElementById("signUpForm").elements.namedItem("password").value;
     var passwordRepeat = document.getElementById("signUpForm").elements.namedItem("repeatPSW").value;
