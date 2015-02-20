@@ -189,10 +189,10 @@ def init_db():
     # Rows for testing purposes only:
     c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
     c.execute("insert into users values ('test2@gmail.com', 'test2', 'fname2', 'famname2', 'male', 'norrk', 'norway')")
-    c.execute("insert into loggedInUsers values ('DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb', 'test@gmail.com')")
+    #c.execute("insert into loggedInUsers values ('DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb', 'test@gmail.com')")
 
     c.commit()
-    print "database initialized"
+
 
 
 def close():

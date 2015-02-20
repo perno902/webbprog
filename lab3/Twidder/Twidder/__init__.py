@@ -1,24 +1,63 @@
+# coding=utf-8
 __author__ = 'wyz'
 
-from flask import Flask, request, app
-import greenlet
-from gevent.wsgi import WSGIServer
-import gevent
-from gevent import pywsgi
-#from gevent import geventwebsocket
-# import WebSocketServer, WebSocketApplication, Resource
+import json
+import random
+import re
 
+from flask import Flask, request, app
+from gevent.wsgi import WSGIServer
+from flask_sockets import Sockets
 import database_helper
-import json, random, re
+from geventwebsocket.handler import WebSocketHandler
+
 
 app = Flask(__name__, static_url_path='')
 app.debug = True
-
+sockets = Sockets(app)
 
 @app.route('/')
 def hello():
     database_helper.init_db()
+    api()
     return app.send_static_file('client.html')
+
+"""
+    Denna metod kan du strunta i sålänge, den körs aldrig ändå men kan ha kvar den ifall man behöver användning för den senare.
+"""
+@sockets.route('/echo')
+def echo_sockets(ws):
+    while True:
+        message = ws.receive()
+        ws.send(message)
+        print "message we have sent: " +  message
+
+
+"""
+    ws är själva websocketen där datan strömmar från client till server. Alltså mellan client.js och __innit__.py.
+    vi lägger allting vi får in i variabeln data och om den inte innehåller något printar vi "no data in socket".
+    För att skicka meddelanden tillbaka till client gör vi ws.send(), och som sagt för att få data från clienten
+    tar vi emot det genom ws.receive(), därmed är tvåvägskommunikationen fullbordad.
+
+    Det verkar som att man bara kan skicka "en rad" med data åt gången. Eller snarare ett anrop från client.js mha av send() åt gången.
+    Har du i client.js t.ex:
+    websocket.send("första raden");
+    websocket.send("andra raden");
+    så kommer vår variabel data i api-metoden vara "första raden" och det skickar vi med ws.send(data) till clienten, sen efter det görs allting om
+    och data blir "andra raden" och vi går sedan och skickar det med ws.send(data).
+"""
+@app.route('/api')
+def api():
+    if request.environ.get('wsgi.websocket'):
+        ws = request.environ['wsgi.websocket']
+        while True:
+            data = ws.receive()
+            if data is None:
+                print "no data in socket"
+                return
+            else:
+                print "token: " + data
+                ws.send("Data in socket: " + data)
 
 
 def validEmail(email):
@@ -106,6 +145,8 @@ def signIn():
         password = request.form['password']
         if database_helper.checkPassword(email, password):
             token = generateToken()
+            if database_helper.userSignedIn(token): # Denna fungerar uppenbarligen inte men här får vi kolla så inte det finns två använder inloggade på samma email.
+                print "duplicate users!!!"
             database_helper.signInUser(token, email)
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
@@ -192,5 +233,7 @@ def teardown_app(exception):
 
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('', 5000), app)
+    app.debug = True
+    http_server = WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    print "Serving on port 5000..."
     http_server.serve_forever()

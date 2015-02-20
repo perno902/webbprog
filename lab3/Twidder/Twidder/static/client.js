@@ -1,30 +1,25 @@
 
-/*
-connect = function(){
-    try{
-        var socket;
-        var host = "http://127.0.0.1:5000/";
-        var socket = new WebSocket(host);
-        socket.onopen = function(){
-            message('<p class="event">Socket Status: '+socket.readyState);
-        };
-        socket.onmessage = function(msg){
-       		 message('<p class="message">Received: '+msg.data);
-        };
+var websocket = new WebSocket("ws://127.0.0.1:5000/");
 
-        socket.onclose = function(){
-       		 message('<p class="event">Socket Status: '+socket.readyState+' (Closed)');
-        };
+websocket.onmessage = function(e){
+    console.log(e.data);
 
-    } catch(exception){
-   		 message('<p>Error'+exception);
-    }
-    };
+};
+
+websocket.onopen = function(){
+    websocket.send("Hello mr.Server");
+};
 
 
-}*/
+
+websocket.onclose = function(){
+    websocket.send("connection closed");
+};
+
 
 displayView = function(){
+
+
    //the code required to display view
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
@@ -35,9 +30,7 @@ displayView = function(){
 };
 
 window.onload = function(){
-    var websocket = new WebSocket("http://127.0.0.1:5000/", "");
-    websocket.send(displayView());
-    //displayView();
+    displayView();
 };
 
 
@@ -116,7 +109,13 @@ function sendForm(){
 
 }
 
-
+/*
+ Om det är en successfull login så skickar vi token till servern med websocket.send()
+ Tanken här tänker jag mig att vi ska hålla reda på den här tokenen så att vi helat iden kollar att det är rätt token
+ vi skickar fram och tillbaka till server. Så fort vi gör något som kräver ett anrop till server genom websocketen måste alltså
+ denna token skickas med och jämföras. På så sätt kan alltså endast en person vara inloggad samtidigt på denna socketen. Hoppas jag.
+ Det är iaf så jag tänker mig att vi borde göra.
+*/
 loginForm = function(){
     var e = document.getElementById("loginForm");
     var formData = new FormData();
@@ -139,6 +138,10 @@ loginForm = function(){
             }else {
                 document.getElementById("loginMessage").innerHTML = "";
                 localStorage.setItem("userToken", result.data);
+
+                websocket.send(localStorage.getItem('userToken'));
+
+
                 displayView();
             }
         }
