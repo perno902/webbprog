@@ -1,23 +1,23 @@
 
-var websocket = new WebSocket("ws://127.0.0.1:5000/");
+var websocket = new WebSocket("ws://127.0.0.1:5000/api");
 
-websocket.onmessage = function(e){
-    console.log(e.data);
+var tokenList = [];
 
+/*
+connect = function(){
+    websocket = new WebSocket(url);
+    websocket.onopen = function(){};
+    websocket.onclose = function(){};
+    websocket.onmessage = function(){
+        if(e.data == "logout"){
+        localStorage.removeItem('userToken');
+    }
+    };
 };
-
-websocket.onopen = function(){
-    websocket.send("Hello mr.Server");
-};
-
-
-
-websocket.onclose = function(){
-    websocket.send("connection closed");
-};
-
+*/
 
 displayView = function(){
+
 
 
    //the code required to display view
@@ -32,6 +32,32 @@ displayView = function(){
 window.onload = function(){
     displayView();
 };
+
+
+
+
+websocket.onopen = function(){
+    console.log("open")
+};
+
+
+
+websocket.onclose = function(){
+    displayView();
+    //websocket.send("connection closed");
+};
+
+
+websocket.onmessage = function(e){
+    if(e.data == "logout") {
+        console.log("removing usertoken: " + localStorage.getItem('userToken'));
+
+        localStorage.removeItem('userToken');
+        websocket.onclose();
+    }
+};
+
+
 
 
 
@@ -109,13 +135,6 @@ function sendForm(){
 
 }
 
-/*
- Om det är en successfull login så skickar vi token till servern med websocket.send()
- Tanken här tänker jag mig att vi ska hålla reda på den här tokenen så att vi helat iden kollar att det är rätt token
- vi skickar fram och tillbaka till server. Så fort vi gör något som kräver ett anrop till server genom websocketen måste alltså
- denna token skickas med och jämföras. På så sätt kan alltså endast en person vara inloggad samtidigt på denna socketen. Hoppas jag.
- Det är iaf så jag tänker mig att vi borde göra.
-*/
 loginForm = function(){
     var e = document.getElementById("loginForm");
     var formData = new FormData();
@@ -137,9 +156,12 @@ loginForm = function(){
 	            document.getElementById("loginMessage").innerHTML = result.message;
             }else {
                 document.getElementById("loginMessage").innerHTML = "";
+                console.log("innan " + localStorage.getItem('userToken'));
                 localStorage.setItem("userToken", result.data);
+                console.log("efter " + localStorage.getItem('userToken'));
 
-                websocket.send(localStorage.getItem('userToken'));
+
+                websocket.send(e.elements.namedItem("username").value);
 
 
                 displayView();
@@ -200,6 +222,7 @@ changePassword = function(){
 
 selectTab = function(item){
 
+    console.log(localStorage.getItem('userToken'));
 
     var changePasswordText = document.getElementById("changePasswordText");
     changePasswordText.innerHTML ="";
@@ -363,3 +386,7 @@ getMessages = function(userEmail, currentUser) {
         }
     };
 };
+
+
+
+

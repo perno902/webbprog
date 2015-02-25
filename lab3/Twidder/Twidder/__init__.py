@@ -1,4 +1,6 @@
 # coding=utf-8
+from geventwebsocket import WebSocketError
+
 __author__ = 'wyz'
 
 import json
@@ -15,49 +17,48 @@ from geventwebsocket.handler import WebSocketHandler
 app = Flask(__name__, static_url_path='')
 app.debug = True
 sockets = Sockets(app)
+wsDict = {}
+
 
 @app.route('/')
 def hello():
-    database_helper.init_db()
-    api()
+    # database_helper.init_db()
+    #api()
     return app.send_static_file('client.html')
 
-"""
-    Denna metod kan du strunta i sålänge, den körs aldrig ändå men kan ha kvar den ifall man behöver användning för den senare.
-"""
+
 @sockets.route('/echo')
 def echo_sockets(ws):
     while True:
         message = ws.receive()
         ws.send(message)
-        print "message we have sent: " +  message
+        print "message we have sent: " + message
 
 
-"""
-    ws är själva websocketen där datan strömmar från client till server. Alltså mellan client.js och __innit__.py.
-    vi lägger allting vi får in i variabeln data och om den inte innehåller något printar vi "no data in socket".
-    För att skicka meddelanden tillbaka till client gör vi ws.send(), och som sagt för att få data från clienten
-    tar vi emot det genom ws.receive(), därmed är tvåvägskommunikationen fullbordad.
-
-    Det verkar som att man bara kan skicka "en rad" med data åt gången. Eller snarare ett anrop från client.js mha av send() åt gången.
-    Har du i client.js t.ex:
-    websocket.send("första raden");
-    websocket.send("andra raden");
-    så kommer vår variabel data i api-metoden vara "första raden" och det skickar vi med ws.send(data) till clienten, sen efter det görs allting om
-    och data blir "andra raden" och vi går sedan och skickar det med ws.send(data).
-"""
 @app.route('/api')
 def api():
-    if request.environ.get('wsgi.websocket'):
-        ws = request.environ['wsgi.websocket']
-        while True:
-            data = ws.receive()
-            if data is None:
-                print "no data in socket"
-                return
+    global wsDict
+    flag = False
+    while True:
+        if request.environ.get('wsgi.websocket'):
+            ws = request.environ['wsgi.websocket']
+            email = ws.receive()
+            if not flag:
+                if email in wsDict:
+                    print "Email is in wsDict"
+                    wsDict.get(email).send("logout")
+                    wsDict.get(email).close()
+                    del wsDict[email]
+
+                print database_helper.getToken(email)
+                wsDict[email] = ws
+                print wsDict
+                flag = True
+
             else:
-                print "token: " + data
-                ws.send("Data in socket: " + data)
+                return ""
+
+    return ""
 
 
 def validEmail(email):
@@ -70,6 +71,7 @@ def validPassword(password):
     if len(password) < 4:
         return False
     return True
+
 
 @app.route('/signUp', methods=["POST"])
 def signUp():
@@ -137,7 +139,6 @@ def changePassword():
             return json.dumps({"success": False, "message": "Could not change password."})
 
 
-
 @app.route('/signIn', methods=["POST"])
 def signIn():
     if request.method == 'POST':
@@ -145,14 +146,13 @@ def signIn():
         password = request.form['password']
         if database_helper.checkPassword(email, password):
             token = generateToken()
-            if database_helper.userSignedIn(token): # Denna fungerar uppenbarligen inte men här får vi kolla så inte det finns två använder inloggade på samma email.
+            if database_helper.userSignedIn(
+                    token):  # Denna fungerar uppenbarligen inte men här får vi kolla så inte det finns två använder inloggade på samma email.
                 print "duplicate users!!!"
             database_helper.signInUser(token, email)
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
             return json.dumps({"success": False, "message": "Wrong username or password."})
-
-
 
 
 @app.route('/postMessage', methods=["POST"])
@@ -174,14 +174,12 @@ def postMessage():
             return json.dumps({"success": False, "message": "You are not signed in"})
 
 
-
-
-
 @app.route('/getMessagesByToken/<token>', methods=["GET"])
 def getMessagesByToken(token):
     if request.method == 'GET':
         userEmail = database_helper.getEmail(token)
         return getMessages(token, userEmail)
+
 
 @app.route('/getMessagesByEmail', methods=["GET"])
 def getMessagesByEmail():
@@ -208,12 +206,14 @@ def getUserDataByToken(token):
         userEmail = database_helper.getEmail(token)
         return getUserData(token, userEmail)
 
+
 @app.route('/getUserDataByEmail', methods=["GET"])
 def getUserDataByEmail():
-     if request.method == 'GET':
+    if request.method == 'GET':
         token = request.args.get('token')
         userEmail = request.args.get('email')
         return getUserData(token, userEmail)
+
 
 def getUserData(token, userEmail):
     if database_helper.userSignedIn(token):
@@ -224,7 +224,6 @@ def getUserData(token, userEmail):
             return json.dumps({"success": False, "message": "Nu such user."})
     else:
         return json.dumps({"success": False, "message": "You are not signed in."})
-
 
 
 @app.teardown_appcontext

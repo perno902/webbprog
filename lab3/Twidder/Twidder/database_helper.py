@@ -38,6 +38,7 @@ def signUpUser(email, password, firstname, familyname, gender, city, country):
 def signInUser(token, email):
     c = get_db()
     try:
+        c.execute("delete from loggedInUsers where email = '" + email + "'")
         c.execute("insert into loggedInUsers values (?, ?)", (token, email))
         c.commit()
     except:
