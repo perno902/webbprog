@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="client.css" type="text/css" rel="stylesheet">
+    <script src="client.js" type="text/javascript"></script>
+    <script id="welcomeView" type=”text/javascript”>
+  <div class="totalSpace">
+
+    <div class="logo">
+      <img src="wimage.png">
+    </div>
+
+    <!-- Login form top right -->
+	<div id="loginDiv">
+      <form id="loginForm" >
+
+		<div class="inputFields">
+			<label for="username">Email: </label>
+			<input type="email" name="username" required>
+		</div>
+
+		<div class="inputFields">
+
+			<label for="password">Password: </label>
+			<input type="password" name="password" pattern=".{4,20}" required>
+		</div>
+
+		<div class="submitButtons">
+		  <p id="loginMessage" class="alertMessage"></p>
+		  <input type="button" name="login" value="Login" onclick="loginForm();">
+		</div>
+      </form>
+	</div>
+
+    <!-- Sign up form lower right -->
+
+	<div id="signUpDiv">
+		<form id="signUpForm">
+
+			<p> Sign up here </p>
+
+
+			<div class="inputFields">
+				<label for="fname">First name: </label>
+				<input type="text" name="firstname" required><br>
+			</div>
+
+			<div class="inputFields">
+				<label for="famName">Family name: </label>
+				<input type="text" name="familyname" required><br>
+			</div>
+
+            <div class="inputFields">
+                <label for="gender">Gender:</label>
+
+			<select id="genderSelect">
+				<option value="Male">Male</option>
+				<option value="Female">Female</option>
+			</select>
+            </div>
+
+			<div class="inputFields">
+				<label for="city">City: </label>
+				<input type="text" name="city" required><br>
+			</div>
+
+			<div class="inputFields">
+				<label for="country">Country: </label>
+				<input type="text" name="country" required><br>
+			</div>
+
+			<div class="inputFields">
+				<label for="email">Email: </label>
+				<input type="email" name="email" required><br>
+			</div>
+
+			<div class="inputFields">
+				<label for="password">Password: </label>
+				<input type="password" name="password" required><br>
+			</div>
+
+			<div class="inputFields">
+				<label for="repeatPSW">Repeat PSW: </label>
+				<input type="password" name="repeatPSW" required><br>
+			</div>
+
+			<div class="submitButtons">
+			  <input type="button" name="submit" value="Submit" onclick="sendForm();">
+			</div>
+		</form>
+		<p id="signupMessage" class="alertMessage"></p>
+	</div>
+    </div>
+</script>
+    <script id="profileView" type="text/view">
+        <div class="totalSpace">
+            <div id="home" onclick="selectTab(this)" class="panelTab" >Home</div>
+            <div id="browse" onclick="selectTab(this)" class="panelTab" >Browse</div>
+            <div id="account" onclick="selectTab(this)" class="panelTab" >Account</div>
+            <div id="displayHome"> 
+	      
+	      <div id = "homePanel">
+		<div id="personalInfo">
+		  <p>Personal info:</p>
+		  <div id="userEmail" class="personalInfoField"> </div>
+		  <div id="userFirstName" class="personalInfoField"> </div>
+		  <div id="userFamilyName" class="personalInfoField"> </div>
+		  <div id="userGender" class="personalInfoField"> </div>
+		  <div id="userCity" class="personalInfoField"> </div>
+		  <div id="userCountry" class="personalInfoField"> </div>
+		</div>
+		<div> 
+		  <button id="reloadWallButton" onclick="getMessages(document.getElementById('userEmail').innerHTML);">Reload wall</button>
+		</div>
+		
+	      </div>
+	      
+	      <div id="postMessage">	
+		<form id="postMessageForm"> 
+		  <input type="text" name="message" required>
+		  <input type="button" name="postMessage" value="Send" onclick="sendMessage();"> 
+		</form>
+	      </div>
+	      
+	      
+	      <div id="wall"> </div>
+	      
+
+	      
+
+
+	    </div>
+            <div id="displayBrowse">
+                <form id="searchForm" onsub   mit="getProfile(document.getElementById('searchForm').elements.namedItem('searchMail').value);">
+		        <label for="searchEmail">Enter a user email: </label>
+		        <input type="text" name="searchEmail" required>
+		        <input type="button" name="search" value="View profile" onclick="searchUser();">
+	            </form>
+	           <p id="browseMessage"></p>
+	        </div>
+            <div id="displayAccount">
+                <div id="changePasswordDiv">
+                    <form id="changePasswordForm">
+                        <div class="inputFields">
+                            <label for="oldPassword">Old password: </label>
+                            <input type="password" name="oldPassword" required>
+		                </div>
+		                <div class="inputFields">
+                            <label for="newPassword">New password: </label>
+                            <input type="password" name="newPassword" required>
+		                </div>
+		                <div id="submitButton">
+			                <input type="button" name="Submit" value="Submit" onclick="changePassword(); this.form.reset();">
+                        </div>
+                        <p id="changePasswordText"></p>
+                    </form>
+                </div>
+                <div id="logoutDiv">
+                    <button id="logoutButton" onclick="logout();">Logout</button>
+                </div>
+            </div>
+        </div>
+    </script>
+  </head>
+  <body>
+    <div id="divTest" class="totalSpace">
+    </div>
+  <div>
+
+  </div>
+
+
+  </body>
+</html>
