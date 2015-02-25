@@ -55,6 +55,12 @@ websocket.onmessage = function(e){
         localStorage.removeItem('userToken');
         websocket.onclose();
     }
+    else if(e.data == "updateWall"){
+        getMessages(document.getElementById('userEmail').innerHTML);
+        getViewCounter(document.getElementById('userEmail').innerHTML);
+        //getProfile(document.getElementById('userEmail').innerHTML, false);
+        console.log("wall updated");
+    }
 };
 
 
@@ -262,8 +268,10 @@ searchUser = function() {
 };
 
 getProfile = function(userEmail, currentUser) {
+    console.log("gettar profile");
     getUserData(userEmail, currentUser);
     getMessages(userEmail, currentUser);
+
 };
 
 getUserData = function(userEmail, currentUser) {
@@ -288,13 +296,44 @@ getUserData = function(userEmail, currentUser) {
             result = JSON.parse(xmlhttp.responseText);
             if (!result.success) {
                 document.getElementById("browseMessage").innerHTML = result.message;
+
             } else {
                 setUserData(JSON.parse(result.data));
+
+            }
+            console.log("innervärdet: ");
+            console.log(document.getElementById('userEmail').innerHTML);
+            getViewCounter(document.getElementById('userEmail').innerHTML);
+        }
+    };
+
+};
+
+getViewCounter = function(userEmail) {
+    var result;
+    var xmlhttp = new XMLHttpRequest();
+
+    console.log("i getviewcounter");
+
+    var url = "/getViewCounter/" + userEmail;
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            result = JSON.parse(xmlhttp.responseText);
+            if (!result.success) {
+                console.log("fail");
+            } else {
+                document.getElementById("profileCounter").innerHTML = result.data;
             }
         }
     };
 
 };
+
+
 
 setUserData = function(userData) {
     document.getElementById("userEmail").innerHTML = userData.email;

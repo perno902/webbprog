@@ -4,7 +4,13 @@
 <head>
     <link href="client.css" type="text/css" rel="stylesheet">
     <script src="client.js" type="text/javascript"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <!-- <script src="C:\Users\cake\Desktop\webprog\webbprog\lab4\Twidder\Chart.js-master\Chart.js"></script> -->
     <script id="welcomeView" type=”text/javascript”>
+
+  <div id="onlineDiv">
+    <p id="onlineCounter"></p>
+  </div>
   <div class="totalSpace">
 
     <div class="logo">
@@ -112,6 +118,12 @@
 		</div>
 		<div> 
 		  <button id="reloadWallButton" onclick="getMessages(document.getElementById('userEmail').innerHTML);">Reload wall</button>
+		</div>
+		<div >
+		    <p>Number of profile views: </p>
+		</div>
+		<div id="viewCounter">
+		    <p id="profileCounter"></p>
 		</div>
 		
 	      </div>

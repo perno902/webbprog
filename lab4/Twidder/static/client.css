@@ -227,5 +227,20 @@ p {
 
 }
 
+#viewCounter{
+    width:130px;
+    border-color: black;
+    height: 20px;
+}
+
+#profileCounter{
+    color: black;
+}
+
+#onlineDiv{
+
+    margin-right: 20px;
+}
+
 
 

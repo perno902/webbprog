@@ -8,8 +8,8 @@ import json
 
 
 
-DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab3\Twidder\Twidder\DATABASE.db"
-#DATABASE = "C:\Users\cake\Desktop\webprog\webbprog\lab3\Twidder\Twidder\DATABASE.db"
+#DATABASE = "C:\Users\Pelle\Documents\Skola\TDDD97\webbprog\lab3\Twidder\Twidder\DATABASE.db"
+DATABASE = "C:\Users\cake\Desktop\webprog\webbprog\lab4\Twidder\DATABASE.db"
 
 
 def connect_db():
@@ -99,6 +99,25 @@ def getUserData(userEmail):
     return dataObj
 
 
+def incrementViews(email):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("update users set viewCounter = viewCounter +1 where email like ?", (email,))
+    c.commit()
+
+
+def getViewCounter(email):
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select viewCounter from users where email like ?", (email,))
+    counter = [row[0] for row in cursor.fetchall()]
+    if len(counter) == 0:
+        return None
+    else:
+        return counter[0]
+
+
+
 def postMessage(token, content, toEmail):
     c = get_db()
     cursor = c.cursor()
@@ -179,7 +198,7 @@ def changePassword(token, oldPassword, newPassword):
 def init_db():
     c = get_db()
     c.execute("drop table if exists users")
-    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT)")
+    c.execute("CREATE TABLE users(email TEXT PRIMARY KEY, password TEXT, firstname TEXT, familyname TEXT, gender TEXT, city TEXT, country TEXT, viewcounter INTEGER)")
     c.execute("drop table if exists loggedInUsers")
 
     c.execute("CREATE TABLE loggedInUsers(token text primary key, email text, foreign key(email) references users(email))")
@@ -188,8 +207,8 @@ def init_db():
 
 
     # Rows for testing purposes only:
-    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden')")
-    c.execute("insert into users values ('test2@gmail.com', 'test2', 'fname2', 'famname2', 'male', 'norrk', 'norway')")
+    c.execute("insert into users values ('test@gmail.com', 'test', 'fname', 'famname', 'male', 'link', 'sweden', 3)")
+    c.execute("insert into users values ('test2@gmail.com', 'test2', 'fname2', 'famname2', 'male', 'norrk', 'norway', 0)")
     #c.execute("insert into loggedInUsers values ('DGk6eSkYXk4OwckycafJrkhVvh3OtcNPVoZUYIbBV4HGgClZadrsWCAont39Zb', 'test@gmail.com')")
 
     c.commit()

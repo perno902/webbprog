@@ -18,11 +18,13 @@ app = Flask(__name__, static_url_path='')
 app.debug = True
 sockets = Sockets(app)
 wsDict = {}
+usersViewing = {}
 
 
 @app.route('/')
 def hello():
-    # database_helper.init_db()
+    #database_helper.init_db()
+    print "database initialized"
     #api()
     return app.send_static_file('client.html')
 
@@ -146,10 +148,10 @@ def signIn():
         password = request.form['password']
         if database_helper.checkPassword(email, password):
             token = generateToken()
-            if database_helper.userSignedIn(
-                    token):  # Denna fungerar uppenbarligen inte men här får vi kolla så inte det finns två använder inloggade på samma email.
+            if database_helper.userSignedIn(token):
                 print "duplicate users!!!"
             database_helper.signInUser(token, email)
+
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
             return json.dumps({"success": False, "message": "Wrong username or password."})
@@ -165,6 +167,12 @@ def postMessage():
         if database_helper.userSignedIn(token):
             if database_helper.userExists(toEmail):
                 if database_helper.postMessage(token, content, toEmail):
+                    print "userviewing dict: " +  str(usersViewing)
+                    for user in usersViewing:                                   # fix this for later
+                        #print "usersviewing[user]: " + str(usersViewing[user])
+                        #if usersViewing[user] == toEmail:
+                            print "getting: " + str(wsDict.get(user))
+                            wsDict.get(user).send("updateWall")
                     return json.dumps({"success": True, "message": "Message posted."})
                 else:
                     return json.dumps({"success": False, "message": "Failed to post message"})
@@ -218,13 +226,29 @@ def getUserDataByEmail():
 def getUserData(token, userEmail):
     if database_helper.userSignedIn(token):
         if database_helper.userExists(userEmail):
+            currentEmail = database_helper.getEmail(token)
+            if not currentEmail == userEmail:
+                print "inte samma så ökar"
+                database_helper.incrementViews(userEmail)
+            print "wsdict: " + str(wsDict)
+            print "userviewdict : " + str(usersViewing)
+            for user in usersViewing:
+                wsDict.get(user).send("updateWall")
             userData = database_helper.getUserData(userEmail)
+            usersViewing[currentEmail] = userEmail
             return json.dumps({"success": True, "message": "User data retrieved.", "data": userData})
         else:
             return json.dumps({"success": False, "message": "Nu such user."})
     else:
         return json.dumps({"success": False, "message": "You are not signed in."})
 
+@app.route('/getViewCounter/<email>', methods=["GET"])
+def getViewCounter(email):
+    if request.method == 'GET':
+        print "hej"
+        data = database_helper.getViewCounter(email)
+        return json.dumps({"success": True, "message": "Viewcounter retrieves", "data": data})
+        #return database_helper.getViewCounter(email)
 
 @app.teardown_appcontext
 def teardown_app(exception):
