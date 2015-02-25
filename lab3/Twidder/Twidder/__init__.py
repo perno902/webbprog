@@ -1,24 +1,64 @@
+# coding=utf-8
+from geventwebsocket import WebSocketError
+
 __author__ = 'wyz'
 
-from flask import Flask, request, app
-import greenlet
-from gevent.wsgi import WSGIServer
-import gevent
-from gevent import pywsgi
-#from gevent import geventwebsocket
-# import WebSocketServer, WebSocketApplication, Resource
+import json
+import random
+import re
 
+from flask import Flask, request, app
+from gevent.wsgi import WSGIServer
+from flask_sockets import Sockets
 import database_helper
-import json, random, re
+from geventwebsocket.handler import WebSocketHandler
+
 
 app = Flask(__name__, static_url_path='')
 app.debug = True
+sockets = Sockets(app)
+wsDict = {}
 
 
 @app.route('/')
 def hello():
-    database_helper.init_db()
+    # database_helper.init_db()
+    #api()
     return app.send_static_file('client.html')
+
+
+@sockets.route('/echo')
+def echo_sockets(ws):
+    while True:
+        message = ws.receive()
+        ws.send(message)
+        print "message we have sent: " + message
+
+
+@app.route('/api')
+def api():
+    global wsDict
+    flag = False
+    while True:
+        if request.environ.get('wsgi.websocket'):
+            ws = request.environ['wsgi.websocket']
+            email = ws.receive()
+            if not flag:
+                if email in wsDict:
+                    print "Email is in wsDict"
+                    wsDict.get(email).send("logout")
+                    wsDict.get(email).close()
+                    del wsDict[email]
+
+                print database_helper.getToken(email)
+                wsDict[email] = ws
+                print wsDict
+                flag = True
+
+            else:
+                return ""
+
+    return ""
 
 
 def validEmail(email):
@@ -31,6 +71,7 @@ def validPassword(password):
     if len(password) < 4:
         return False
     return True
+
 
 @app.route('/signUp', methods=["POST"])
 def signUp():
@@ -98,7 +139,6 @@ def changePassword():
             return json.dumps({"success": False, "message": "Could not change password."})
 
 
-
 @app.route('/signIn', methods=["POST"])
 def signIn():
     if request.method == 'POST':
@@ -106,12 +146,13 @@ def signIn():
         password = request.form['password']
         if database_helper.checkPassword(email, password):
             token = generateToken()
+            if database_helper.userSignedIn(
+                    token):  # Denna fungerar uppenbarligen inte men här får vi kolla så inte det finns två använder inloggade på samma email.
+                print "duplicate users!!!"
             database_helper.signInUser(token, email)
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
             return json.dumps({"success": False, "message": "Wrong username or password."})
-
-
 
 
 @app.route('/postMessage', methods=["POST"])
@@ -133,14 +174,12 @@ def postMessage():
             return json.dumps({"success": False, "message": "You are not signed in"})
 
 
-
-
-
 @app.route('/getMessagesByToken/<token>', methods=["GET"])
 def getMessagesByToken(token):
     if request.method == 'GET':
         userEmail = database_helper.getEmail(token)
         return getMessages(token, userEmail)
+
 
 @app.route('/getMessagesByEmail', methods=["GET"])
 def getMessagesByEmail():
@@ -167,12 +206,14 @@ def getUserDataByToken(token):
         userEmail = database_helper.getEmail(token)
         return getUserData(token, userEmail)
 
+
 @app.route('/getUserDataByEmail', methods=["GET"])
 def getUserDataByEmail():
-     if request.method == 'GET':
+    if request.method == 'GET':
         token = request.args.get('token')
         userEmail = request.args.get('email')
         return getUserData(token, userEmail)
+
 
 def getUserData(token, userEmail):
     if database_helper.userSignedIn(token):
@@ -185,12 +226,13 @@ def getUserData(token, userEmail):
         return json.dumps({"success": False, "message": "You are not signed in."})
 
 
-
 @app.teardown_appcontext
 def teardown_app(exception):
     database_helper.close()
 
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('', 5000), app)
+    app.debug = True
+    http_server = WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    print "Serving on port 5000..."
     http_server.serve_forever()

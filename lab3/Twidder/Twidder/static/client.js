@@ -1,30 +1,25 @@
 
+var websocket = new WebSocket("ws://127.0.0.1:5000/api");
+
+var tokenList = [];
+
 /*
 connect = function(){
-    try{
-        var socket;
-        var host = "http://127.0.0.1:5000/";
-        var socket = new WebSocket(host);
-        socket.onopen = function(){
-            message('<p class="event">Socket Status: '+socket.readyState);
-        };
-        socket.onmessage = function(msg){
-       		 message('<p class="message">Received: '+msg.data);
-        };
-
-        socket.onclose = function(){
-       		 message('<p class="event">Socket Status: '+socket.readyState+' (Closed)');
-        };
-
-    } catch(exception){
-   		 message('<p>Error'+exception);
+    websocket = new WebSocket(url);
+    websocket.onopen = function(){};
+    websocket.onclose = function(){};
+    websocket.onmessage = function(){
+        if(e.data == "logout"){
+        localStorage.removeItem('userToken');
     }
     };
-
-
-}*/
+};
+*/
 
 displayView = function(){
+
+
+
    //the code required to display view
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
@@ -35,10 +30,34 @@ displayView = function(){
 };
 
 window.onload = function(){
-    var websocket = new WebSocket("http://127.0.0.1:5000/", "");
-    websocket.send(displayView());
-    //displayView();
+    displayView();
 };
+
+
+
+
+websocket.onopen = function(){
+    console.log("open")
+};
+
+
+
+websocket.onclose = function(){
+    displayView();
+    //websocket.send("connection closed");
+};
+
+
+websocket.onmessage = function(e){
+    if(e.data == "logout") {
+        console.log("removing usertoken: " + localStorage.getItem('userToken'));
+
+        localStorage.removeItem('userToken');
+        websocket.onclose();
+    }
+};
+
+
 
 
 
@@ -116,7 +135,6 @@ function sendForm(){
 
 }
 
-
 loginForm = function(){
     var e = document.getElementById("loginForm");
     var formData = new FormData();
@@ -138,7 +156,14 @@ loginForm = function(){
 	            document.getElementById("loginMessage").innerHTML = result.message;
             }else {
                 document.getElementById("loginMessage").innerHTML = "";
+                console.log("innan " + localStorage.getItem('userToken'));
                 localStorage.setItem("userToken", result.data);
+                console.log("efter " + localStorage.getItem('userToken'));
+
+
+                websocket.send(e.elements.namedItem("username").value);
+
+
                 displayView();
             }
         }
@@ -197,6 +222,7 @@ changePassword = function(){
 
 selectTab = function(item){
 
+    console.log(localStorage.getItem('userToken'));
 
     var changePasswordText = document.getElementById("changePasswordText");
     changePasswordText.innerHTML ="";
@@ -360,3 +386,7 @@ getMessages = function(userEmail, currentUser) {
         }
     };
 };
+
+
+
+
