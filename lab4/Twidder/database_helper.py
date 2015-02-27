@@ -176,6 +176,14 @@ def signOut(token):
             return False
 
 
+def usersLoggedIn():
+    c = get_db()
+    cursor = c.cursor()
+    cursor.execute("select count(*) from loggedInUsers")
+    result = [row[0] for row in cursor.fetchall()][0]
+    return result
+
+
 def changePassword(token, oldPassword, newPassword):
     c = get_db()
     cursor = c.cursor()

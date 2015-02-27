@@ -39,6 +39,7 @@ def echo_sockets(ws):
 
 @app.route('/api')
 def api():
+
     global wsDict
     flag = False
     while True:
@@ -54,6 +55,7 @@ def api():
 
                 print database_helper.getToken(email)
                 wsDict[email] = ws
+                updateCounter()
                 print wsDict
                 flag = True
 
@@ -61,6 +63,20 @@ def api():
                 return ""
 
     return ""
+
+
+def updateCounter():
+    print "entering updateCounter()..."
+    print wsDict
+    for user in wsDict:
+        print "sending to users in wsDict.."
+        wsDict[user].send("updateCounter")
+
+
+@app.route('/getOnlineCounter', methods=['GET'])
+def getOnlineCounter():
+    print "getting onlinecounter in __init__"
+    return json.dumps({"success": True, "message": "Successfully retrieved online counter.", "data": database_helper.usersLoggedIn()})
 
 
 def validEmail(email):
@@ -121,6 +137,7 @@ def signOut():
             return json.dumps({"success": False, "message": "No such user logged in."})
 
         if database_helper.signOut(token):
+            updateCounter()
             return json.dumps({"success": True, "message": "Successfully logged out."})
         else:
             return json.dumps({"success": False, "message": "Could not log out."})
@@ -151,7 +168,8 @@ def signIn():
             if database_helper.userSignedIn(token):
                 print "duplicate users!!!"
             database_helper.signInUser(token, email)
-
+            updateCounter()
+            print "updateCounter() was run"
             return json.dumps({"success": True, "message": "Successfully signed in.", "data": token})
         else:
             return json.dumps({"success": False, "message": "Wrong username or password."})
@@ -167,7 +185,7 @@ def postMessage():
         if database_helper.userSignedIn(token):
             if database_helper.userExists(toEmail):
                 if database_helper.postMessage(token, content, toEmail):
-                    print "userviewing dict: " +  str(usersViewing)
+                    print "userviewing dict: " + str(usersViewing)
                     for user in usersViewing:                                   # fix this for later
                         #print "usersviewing[user]: " + str(usersViewing[user])
                         #if usersViewing[user] == toEmail:
@@ -245,7 +263,6 @@ def getUserData(token, userEmail):
 @app.route('/getViewCounter/<email>', methods=["GET"])
 def getViewCounter(email):
     if request.method == 'GET':
-        print "hej"
         data = database_helper.getViewCounter(email)
         return json.dumps({"success": True, "message": "Viewcounter retrieves", "data": data})
         #return database_helper.getViewCounter(email)

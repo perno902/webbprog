@@ -3,27 +3,21 @@ var websocket = new WebSocket("ws://127.0.0.1:5000/api");
 
 var tokenList = [];
 
-/*
-connect = function(){
-    websocket = new WebSocket(url);
-    websocket.onopen = function(){};
-    websocket.onclose = function(){};
-    websocket.onmessage = function(){
-        if(e.data == "logout"){
-        localStorage.removeItem('userToken');
-    }
-    };
-};
-*/
+var flag = true;
+
+
+
 
 displayView = function(){
-
-
 
    //the code required to display view
     if(localStorage.getItem("userToken")){
         document.getElementById("divTest").innerHTML = document.getElementById("profileView").innerHTML;
         selectTab(document.getElementById("home"));
+        getOnlineCounter();
+        //getViewCounter();
+        //getViewCounter(document.getElementById('userEmail').innerHTML);
+
     }else{
         document.getElementById("divTest").innerHTML = document.getElementById("welcomeView").innerHTML;
     }
@@ -31,6 +25,7 @@ displayView = function(){
 
 window.onload = function(){
     displayView();
+
 };
 
 
@@ -61,6 +56,12 @@ websocket.onmessage = function(e){
         //getProfile(document.getElementById('userEmail').innerHTML, false);
         console.log("wall updated");
     }
+    else if(e.data == "updateCounter"){
+        console.log("onmessage update counter!");
+
+        getOnlineCounter();
+    }
+
 };
 
 
@@ -166,10 +167,7 @@ loginForm = function(){
                 localStorage.setItem("userToken", result.data);
                 console.log("efter " + localStorage.getItem('userToken'));
 
-
                 websocket.send(e.elements.namedItem("username").value);
-
-
                 displayView();
             }
         }
@@ -301,7 +299,6 @@ getUserData = function(userEmail, currentUser) {
                 setUserData(JSON.parse(result.data));
 
             }
-            console.log("innervärdet: ");
             console.log(document.getElementById('userEmail').innerHTML);
             getViewCounter(document.getElementById('userEmail').innerHTML);
         }
@@ -312,8 +309,6 @@ getUserData = function(userEmail, currentUser) {
 getViewCounter = function(userEmail) {
     var result;
     var xmlhttp = new XMLHttpRequest();
-
-    console.log("i getviewcounter");
 
     var url = "/getViewCounter/" + userEmail;
 
@@ -326,14 +321,62 @@ getViewCounter = function(userEmail) {
             if (!result.success) {
                 console.log("fail");
             } else {
-                document.getElementById("profileCounter").innerHTML = result.data;
+
+                var clock = $('.clockTwo').FlipClock(0, {
+                autoStart: false,
+                clockFace: 'Counter'
+            });
+            $(function() {
+                if(flag){
+                    clock.setTime(result.data);
+                    //console.log(getOnlineCounter);
+                }
+                //flag = false;
+            });
+
+
+                //document.getElementById("profileCounter").innerHTML = result.data;
             }
         }
     };
 
 };
 
+getOnlineCounter = function() {
+    var result;
+    var xmlhttp = new XMLHttpRequest();
 
+    var url = "/getOnlineCounter";
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            result = JSON.parse(xmlhttp.responseText);
+            if (!result.success) {
+                console.log("fail");
+
+            } else {
+                var clock = $('.clock').FlipClock(0, {
+                autoStart: false,
+                clockFace: 'Counter'
+            });
+            $(function() {
+                if(flag){
+                    clock.setTime(result.data);
+                    //console.log(getOnlineCounter);
+                }
+                //flag = false;
+            });
+
+                //document.getElementById("onlineCounter").innerHTML = result.data;
+                //return true;
+            }
+        }
+    };
+
+};
 
 setUserData = function(userData) {
     document.getElementById("userEmail").innerHTML = userData.email;
